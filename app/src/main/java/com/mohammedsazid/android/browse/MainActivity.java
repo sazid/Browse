@@ -33,7 +33,7 @@ public class MainActivity extends AppCompatActivity implements TextView.OnEditor
         setContentView(R.layout.activity_main);
         bindViews();
         setupWebView();
-        addressBarEt.setImeActionLabel("GO", EditorInfo.IME_ACTION_SEND);
+//        addressBarEt.setImeActionLabel("GO", EditorInfo.IME_ACTION_SEND);
         addressBarEt.setOnEditorActionListener(this);
         webView.loadUrl("http://google.com/");
     }
@@ -107,7 +107,7 @@ public class MainActivity extends AppCompatActivity implements TextView.OnEditor
 
     @Override
     public boolean onEditorAction(TextView textView, int actionId, KeyEvent keyEvent) {
-        if (actionId == EditorInfo.IME_ACTION_SEND) {
+        if (actionId == EditorInfo.IME_ACTION_GO) {
             webView.loadUrl(textView.getText().toString());
         }
 
