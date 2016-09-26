@@ -13,6 +13,7 @@ import android.webkit.WebResourceError;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
@@ -26,6 +27,7 @@ public class MainActivity extends AppCompatActivity implements TextView.OnEditor
     private TextView titleTv;
     private ImageView iconIv;
     private ProgressBar progressBar;
+    private Button menuButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,6 +45,7 @@ public class MainActivity extends AppCompatActivity implements TextView.OnEditor
         titleTv = (TextView) findViewById(R.id.title_tv);
         iconIv = (ImageView) findViewById(R.id.icon_iv);
         progressBar = (ProgressBar) findViewById(R.id.progressBar);
+        menuButton = (Button) findViewById(R.id.menu_button);
     }
 
     private void setupWebView() {
@@ -123,5 +126,9 @@ public class MainActivity extends AppCompatActivity implements TextView.OnEditor
         } else {
             super.onBackPressed();
         }
+    }
+
+    public void onMenuButtonClick(View v) {
+        webView.stopLoading();
     }
 }
