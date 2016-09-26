@@ -33,7 +33,6 @@ public class MainActivity extends AppCompatActivity implements TextView.OnEditor
         setContentView(R.layout.activity_main);
         bindViews();
         setupWebView();
-//        addressBarEt.setImeActionLabel("GO", EditorInfo.IME_ACTION_SEND);
         addressBarEt.setOnEditorActionListener(this);
         webView.loadUrl("http://google.com/");
     }
@@ -84,6 +83,7 @@ public class MainActivity extends AppCompatActivity implements TextView.OnEditor
                 } else {
                     progressBar.setVisibility(View.VISIBLE);
                 }
+
                 super.onProgressChanged(view, newProgress);
             }
 
@@ -91,6 +91,7 @@ public class MainActivity extends AppCompatActivity implements TextView.OnEditor
             public void onReceivedTitle(WebView view, String title) {
                 super.onReceivedTitle(view, title);
                 titleTv.setText(title);
+                addressBarEt.setText(webView.getUrl());
             }
 
             @Override
@@ -117,6 +118,7 @@ public class MainActivity extends AppCompatActivity implements TextView.OnEditor
     @Override
     public void onBackPressed() {
         if (webView.canGoBack()) {
+            webView.stopLoading();
             webView.goBack();
         } else {
             super.onBackPressed();

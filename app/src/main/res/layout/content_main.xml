@@ -92,8 +92,7 @@
             android:paddingLeft="8dp"
             android:paddingRight="8dp"
             android:paddingStart="8dp"
-            android:scrollHorizontally="true"
-            android:textAppearance="?android:attr/textAppearanceLarge" />
+            android:scrollHorizontally="true" />
 
         <Button
             android:id="@+id/menu_button"
