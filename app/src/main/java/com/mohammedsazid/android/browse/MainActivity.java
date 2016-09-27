@@ -8,6 +8,7 @@ import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.PopupMenu;
@@ -30,6 +31,9 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.afollestad.materialdialogs.DialogAction;
+import com.afollestad.materialdialogs.MaterialDialog;
+
 public class MainActivity extends AppCompatActivity
         implements TextView.OnEditorActionListener, PopupMenu.OnMenuItemClickListener {
 
@@ -46,8 +50,8 @@ public class MainActivity extends AppCompatActivity
         setContentView(R.layout.activity_main);
         bindViews();
         setupWebView();
-		setupAddressBar();
-        webView.loadUrl("http://google.com/");
+        setupAddressBar();
+//        webView.loadUrl("http://google.com/");
     }
 
     private void bindViews() {
@@ -58,18 +62,18 @@ public class MainActivity extends AppCompatActivity
         progressBar = (ProgressBar) findViewById(R.id.progressBar);
         menuButton = (ImageButton) findViewById(R.id.menu_button);
     }
-	
-	private void setupAddressBar() {
-		addressBarEt.setOnEditorActionListener(this);
+
+    private void setupAddressBar() {
+        addressBarEt.setOnEditorActionListener(this);
         addressBarEt.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-			@Override
-			public void onFocusChange(View v, boolean hasFocus) {
-					if(hasFocus){
-                        addressBarEt.selectAll();
-					}
-				}
-		});
-	}
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                if (hasFocus) {
+                    addressBarEt.selectAll();
+                }
+            }
+        });
+    }
 
     private void setupWebView() {
         final AppCompatActivity activity = this;
@@ -166,9 +170,6 @@ public class MainActivity extends AppCompatActivity
     private void loadWebPage(String queryOrUrl) {
         boolean isUrl = Patterns.WEB_URL.matcher(queryOrUrl).matches();
         if (isUrl) {
-//            if (!queryOrUrl.startsWith("http") || !queryOrUrl.startsWith("https")) {
-//                queryOrUrl = "http://" +  queryOrUrl;
-//            }
             Uri url = Uri.parse(queryOrUrl);
             if (TextUtils.isEmpty(url.getScheme())) {
                 url = url.buildUpon()
@@ -251,10 +252,53 @@ public class MainActivity extends AppCompatActivity
                 return true;
 
             case R.id.action_about:
+                showAboutDialog();
+                return true;
 
+            case R.id.action_share:
+                shareUrl();
                 return true;
         }
 
         return false;
     }
+
+    private void composeEmail(String[] addresses, String subject, String body) {
+        Intent intent = new Intent(Intent.ACTION_SENDTO);
+        intent.setData(Uri.parse("mailto:"));
+        intent.putExtra(Intent.EXTRA_EMAIL, addresses);
+        intent.putExtra(Intent.EXTRA_SUBJECT, subject);
+        intent.putExtra(Intent.EXTRA_TEXT, body);
+        if (intent.resolveActivity(getPackageManager()) != null) {
+            startActivity(intent);
+        }
+    }
+
+    private void showAboutDialog() {
+        new MaterialDialog.Builder(this)
+                .title(R.string.app_name)
+                .content(R.string.about_summary)
+                .positiveText("OK")
+                .neutralText("EMAIL")
+                .onNeutral(new MaterialDialog.SingleButtonCallback() {
+                    @Override
+                    public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                        composeEmail(
+                                new String[]{"sazidozon@gmail.com"},
+                                "[Browse]: Feedback & Suggestions",
+                                ""
+                        );
+                    }
+                })
+                .show();
+    }
+
+    private void shareUrl() {
+        Intent i = new Intent(Intent.ACTION_SEND);
+        i.setType("text/plain");
+//        i.putExtra(Intent.EXTRA_SUBJECT, "Sharing URL");
+        i.putExtra(Intent.EXTRA_TEXT, webView.getUrl());
+        startActivity(Intent.createChooser(i, "Share URL"));
+    }
+
 }
