@@ -27,7 +27,8 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class MainActivity extends AppCompatActivity implements TextView.OnEditorActionListener, PopupMenu.OnMenuItemClickListener {
+public class MainActivity extends AppCompatActivity
+        implements TextView.OnEditorActionListener, PopupMenu.OnMenuItemClickListener {
 
     private WebView webView;
     private EditText addressBarEt;
@@ -42,7 +43,7 @@ public class MainActivity extends AppCompatActivity implements TextView.OnEditor
         setContentView(R.layout.activity_main);
         bindViews();
         setupWebView();
-        addressBarEt.setOnEditorActionListener(this);
+		setupAddressBar();
         webView.loadUrl("http://google.com/");
     }
 
@@ -54,6 +55,18 @@ public class MainActivity extends AppCompatActivity implements TextView.OnEditor
         progressBar = (ProgressBar) findViewById(R.id.progressBar);
         menuButton = (ImageButton) findViewById(R.id.menu_button);
     }
+	
+	private void setupAddressBar() {
+		addressBarEt.setOnEditorActionListener(this);
+        addressBarEt.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+			@Override
+			public void onFocusChange(View v, boolean hasFocus) {
+					if(hasFocus){
+                        addressBarEt.selectAll();
+					}
+				}
+		});
+	}
 
     private void setupWebView() {
         final AppCompatActivity activity = this;
@@ -208,6 +221,10 @@ public class MainActivity extends AppCompatActivity implements TextView.OnEditor
                     intent.addFlags(Intent.FLAG_ACTIVITY_NEW_DOCUMENT);
                     startActivity(intent);
                 }
+                return true;
+
+            case R.id.action_about:
+
                 return true;
         }
 
