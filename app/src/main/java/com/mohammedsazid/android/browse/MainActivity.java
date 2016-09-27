@@ -18,9 +18,10 @@ import android.util.Patterns;
 import android.view.KeyEvent;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
-import android.webkit.WebChromeClient;
 import android.webkit.WebResourceError;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebView;
@@ -39,11 +40,16 @@ public class MainActivity extends AppCompatActivity
         implements TextView.OnEditorActionListener, PopupMenu.OnMenuItemClickListener {
 
     private VideoEnabledWebView webView;
+    private View nonVideoLayout;
+    private ViewGroup videoLayout;
+    private View loadingView;
     private EditText addressBarEt;
     private TextView titleTv;
     private ImageView iconIv;
     private ProgressBar progressBar;
     private ImageButton menuButton;
+
+    private VideoEnabledWebChromeClient webChromeClient;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,11 +63,15 @@ public class MainActivity extends AppCompatActivity
 
     private void bindViews() {
         webView = (VideoEnabledWebView) findViewById(R.id.browse_webview);
+        nonVideoLayout = findViewById(R.id.nonVideoLayout);
+        videoLayout = (ViewGroup) findViewById(R.id.videoLayout);
         addressBarEt = (EditText) findViewById(R.id.addressbar_et);
         titleTv = (TextView) findViewById(R.id.title_tv);
         iconIv = (ImageView) findViewById(R.id.icon_iv);
         progressBar = (ProgressBar) findViewById(R.id.progressBar);
         menuButton = (ImageButton) findViewById(R.id.menu_button);
+
+        loadingView = getLayoutInflater().inflate(R.layout.view_loading_video, null);
     }
 
     private void checkAndLaunchUrlFromIntent(Intent intent) {
@@ -88,15 +98,12 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void setupWebView() {
-        final AppCompatActivity activity = this;
-        webView.getSettings().setJavaScriptEnabled(true);
+//        webView.getSettings().setJavaScriptEnabled(true);
         webView.getSettings().setSupportZoom(true);
         webView.getSettings().setBuiltInZoomControls(true);
         webView.getSettings().setDisplayZoomControls(false);
 
-        webView.setWebViewClient(new InsideWebViewClient(this));
-
-        webView.setWebChromeClient(new WebChromeClient() {
+        webChromeClient = new VideoEnabledWebChromeClient(nonVideoLayout, videoLayout, loadingView, webView) {
             @Override
             public void onProgressChanged(WebView view, int newProgress) {
                 if (newProgress == 100) {
@@ -120,7 +127,37 @@ public class MainActivity extends AppCompatActivity
                 super.onReceivedIcon(view, icon);
                 setTaskTitleAndIcon(titleTv.getText().toString(), icon);
             }
+        };
+
+        webChromeClient.setOnToggledFullscreen(new VideoEnabledWebChromeClient.ToggledFullscreenCallback() {
+            @Override
+            public void toggledFullscreen(boolean fullscreen) {
+                // Your code to handle the full-screen change, for example showing and hiding the title bar. Example:
+                if (fullscreen) {
+                    WindowManager.LayoutParams attrs = getWindow().getAttributes();
+                    attrs.flags |= WindowManager.LayoutParams.FLAG_FULLSCREEN;
+                    attrs.flags |= WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON;
+                    getWindow().setAttributes(attrs);
+                    if (android.os.Build.VERSION.SDK_INT >= 14) {
+                        //noinspection all
+                        getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LOW_PROFILE);
+                    }
+                } else {
+                    WindowManager.LayoutParams attrs = getWindow().getAttributes();
+                    attrs.flags &= ~WindowManager.LayoutParams.FLAG_FULLSCREEN;
+                    attrs.flags &= ~WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON;
+                    getWindow().setAttributes(attrs);
+                    if (android.os.Build.VERSION.SDK_INT >= 14) {
+                        //noinspection all
+                        getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_VISIBLE);
+                    }
+                }
+            }
         });
+
+        webView.setWebChromeClient(webChromeClient);
+        webView.setWebViewClient(new InsideWebViewClient(this));
+
     }
 
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
@@ -181,11 +218,13 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onBackPressed() {
-        if (webView.canGoBack()) {
-            webView.stopLoading();
-            webView.goBack();
-        } else {
-            super.onBackPressed();
+        if (!webChromeClient.onBackPressed()) {
+            if (webView.canGoBack()) {
+                webView.stopLoading();
+                webView.goBack();
+            } else {
+                super.onBackPressed();
+            }
         }
     }
 

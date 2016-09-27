@@ -5,6 +5,13 @@
     android:layout_height="match_parent"
     tools:context="com.mohammedsazid.android.browse.MainActivity">
 
+    <!-- View that will be hidden when video goes fullscreen -->
     <include layout="@layout/content_main" />
+
+    <!-- View where the video will be shown when video goes fullscreen -->
+    <FrameLayout
+        android:id="@+id/videoLayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
 
 </RelativeLayout>
