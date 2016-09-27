@@ -67,10 +67,10 @@
             android:ellipsize="end"
             android:gravity="center_vertical"
             android:maxLines="1"
-            android:paddingEnd="8dp"
-            android:paddingLeft="8dp"
-            android:paddingRight="8dp"
-            android:paddingStart="8dp"
+            android:paddingEnd="4dp"
+            android:paddingLeft="4dp"
+            android:paddingRight="4dp"
+            android:paddingStart="4dp"
             android:text=""
             android:textAppearance="?android:attr/textAppearanceSmall"
             android:textColor="@android:color/black" />
@@ -102,11 +102,14 @@
             android:scrollHorizontally="true"
             android:textColor="@android:color/black" />
 
-        <Button
-            android:onClick="onMenuButtonClick"
+        <ImageButton
+            android:background="?android:selectableItemBackground"
+            android:clickable="true"
             android:id="@+id/menu_button"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:onClick="onMenuButtonClick"
+            android:src="@drawable/ic_more"
             android:text="X" />
 
     </LinearLayout>
