@@ -125,6 +125,11 @@ public class MainActivity extends AppCompatActivity
             @Override
             public void onReceivedIcon(WebView view, Bitmap icon) {
                 super.onReceivedIcon(view, icon);
+                if (icon != null) {
+                    iconIv.setImageBitmap(icon);
+                } else {
+                    iconIv.setImageResource(R.drawable.ic_default);
+                }
                 setTaskTitleAndIcon(titleTv.getText().toString(), icon);
             }
         };
@@ -168,13 +173,9 @@ public class MainActivity extends AppCompatActivity
             ActivityManager.TaskDescription taskDescription;
 
             if (icon != null) {
-                iconIv.setImageBitmap(icon);
-
                 taskDescription = new ActivityManager.TaskDescription("B: " + title, icon);
                 setTaskDescription(taskDescription);
             } else {
-                iconIv.setImageResource(R.drawable.ic_default);
-
                 taskDescription = new ActivityManager.TaskDescription("B: " + title);
                 setTaskDescription(taskDescription);
             }
