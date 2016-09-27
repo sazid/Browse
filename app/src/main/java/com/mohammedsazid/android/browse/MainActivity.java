@@ -5,11 +5,14 @@ import android.app.ActivityManager;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.PopupMenu;
+import android.text.TextUtils;
+import android.util.Patterns;
 import android.view.KeyEvent;
 import android.view.MenuItem;
 import android.view.View;
@@ -151,13 +154,37 @@ public class MainActivity extends AppCompatActivity
     @Override
     public boolean onEditorAction(TextView textView, int actionId, KeyEvent keyEvent) {
         if (actionId == EditorInfo.IME_ACTION_GO) {
-            webView.loadUrl(textView.getText().toString());
+            loadWebPage(textView.getText().toString());
             InputMethodManager imm = (InputMethodManager)
                     getSystemService(Context.INPUT_METHOD_SERVICE);
             imm.hideSoftInputFromWindow(textView.getWindowToken(), 0);
         }
 
         return true;
+    }
+
+    private void loadWebPage(String queryOrUrl) {
+        boolean isUrl = Patterns.WEB_URL.matcher(queryOrUrl).matches();
+        if (isUrl) {
+//            if (!queryOrUrl.startsWith("http") || !queryOrUrl.startsWith("https")) {
+//                queryOrUrl = "http://" +  queryOrUrl;
+//            }
+            Uri url = Uri.parse(queryOrUrl);
+            if (TextUtils.isEmpty(url.getScheme())) {
+                url = url.buildUpon()
+                        .scheme("http")
+                        .build();
+            }
+
+            webView.loadUrl(url.toString());
+            return;
+        }
+
+        Uri searchQuery = Uri.parse("https://www.google.com/search")
+                .buildUpon()
+                .appendQueryParameter("q", queryOrUrl)
+                .build();
+        webView.loadUrl(searchQuery.toString());
     }
 
     @Override
