@@ -1,6 +1,7 @@
 package com.mohammedsazid.android.browse;
 
 import android.annotation.TargetApi;
+import android.app.Activity;
 import android.app.ActivityManager;
 import android.content.Context;
 import android.content.Intent;
@@ -93,28 +94,7 @@ public class MainActivity extends AppCompatActivity
         webView.getSettings().setBuiltInZoomControls(true);
         webView.getSettings().setDisplayZoomControls(false);
 
-        webView.setWebViewClient(new WebViewClient() {
-            @Override
-            public void onReceivedError(WebView view, int errorCode, String description, String failingUrl) {
-                super.onReceivedError(view, errorCode, description, failingUrl);
-                Toast.makeText(
-                        activity,
-                        "Error occurred: " + description,
-                        Toast.LENGTH_SHORT
-                ).show();
-            }
-
-            @TargetApi(Build.VERSION_CODES.M)
-            @Override
-            public void onReceivedError(WebView view, WebResourceRequest request, WebResourceError error) {
-                Toast.makeText(
-                        activity,
-                        "Error occurred: " + error.getDescription(),
-                        Toast.LENGTH_SHORT
-                ).show();
-                super.onReceivedError(view, request, error);
-            }
-        });
+        webView.setWebViewClient(new InsideWebViewClient(this));
 
         webView.setWebChromeClient(new WebChromeClient() {
             @Override
@@ -310,6 +290,53 @@ public class MainActivity extends AppCompatActivity
 //        i.putExtra(Intent.EXTRA_SUBJECT, "Sharing URL");
         i.putExtra(Intent.EXTRA_TEXT, webView.getUrl());
         startActivity(Intent.createChooser(i, "Share URL"));
+    }
+
+    private class InsideWebViewClient extends WebViewClient {
+
+        private Activity activity;
+
+        public InsideWebViewClient(Activity activity) {
+            this.activity = activity;
+        }
+
+        @TargetApi(Build.VERSION_CODES.LOLLIPOP)
+        @Override
+        // Force links to be opened inside WebView and not in Default Browser
+        // Thanks http://stackoverflow.com/a/33681975/1815624
+        public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
+            view.loadUrl(request.getUrl().toString());
+            return super.shouldOverrideUrlLoading(view, request);
+        }
+
+        @Override
+        // Force links to be opened inside WebView and not in Default Browser
+        // Thanks http://stackoverflow.com/a/33681975/1815624
+        public boolean shouldOverrideUrlLoading(WebView view, String url) {
+            view.loadUrl(url);
+            return true;
+        }
+
+        @Override
+        public void onReceivedError(WebView view, int errorCode, String description, String failingUrl) {
+            super.onReceivedError(view, errorCode, description, failingUrl);
+            Toast.makeText(
+                    activity,
+                    "Error occurred: " + description,
+                    Toast.LENGTH_SHORT
+            ).show();
+        }
+
+        @TargetApi(Build.VERSION_CODES.M)
+        @Override
+        public void onReceivedError(WebView view, WebResourceRequest request, WebResourceError error) {
+            Toast.makeText(
+                    activity,
+                    "Error occurred: " + error.getDescription(),
+                    Toast.LENGTH_SHORT
+            ).show();
+            super.onReceivedError(view, request, error);
+        }
     }
 
 }
