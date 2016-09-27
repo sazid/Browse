@@ -2,16 +2,15 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item
-        android:id="@+id/one"
-        android:icon="@drawable/ic_cancel"
-        android:title="One" />
+        android:id="@+id/action_forward"
+        android:title="@string/action_forward" />
 
     <item
-        android:id="@+id/two"
-        android:title="Two" />
+        android:id="@+id/action_reload"
+        android:title="@string/action_reload" />
 
     <item
-        android:id="@+id/three"
-        android:title="Three" />
+        android:id="@+id/action_stop"
+        android:title="@string/action_stop" />
 
 </menu>

@@ -1,3 +1,6 @@
 <resources>
     <string name="app_name">Browse</string>
+    <string name="action_stop">Stop</string>
+    <string name="action_reload">Reload</string>
+    <string name="action_forward">Forward</string>
 </resources>

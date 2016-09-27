@@ -8,7 +8,6 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.PopupMenu;
 import android.view.KeyEvent;
-import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
@@ -146,11 +145,38 @@ public class MainActivity extends AppCompatActivity implements TextView.OnEditor
         popup.getMenuInflater()
                 .inflate(R.menu.menu_main, popup.getMenu());
         popup.setOnMenuItemClickListener(this);
+
+        // force shows popup menu icons
+//        try {
+//            Field mFieldPopup = popup.getClass().getDeclaredField("mPopup");
+//            mFieldPopup.setAccessible(true);
+//            MenuPopupHelper mPopup = (MenuPopupHelper) mFieldPopup.get(popup);
+//            mPopup.setForceShowIcon(true);
+//        } catch (Exception e) {
+//        }
+
         popup.show();
     }
 
     @Override
     public boolean onMenuItemClick(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_stop:
+                webView.stopLoading();
+                return true;
+
+            case R.id.action_reload:
+                webView.stopLoading();
+                webView.reload();
+                return true;
+
+            case R.id.action_forward:
+                if (webView.canGoForward()) {
+                    webView.goForward();
+                }
+                return true;
+        }
+
         return false;
     }
 }
