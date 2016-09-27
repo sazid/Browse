@@ -1,10 +1,13 @@
 package com.mohammedsazid.android.browse;
 
 import android.annotation.TargetApi;
+import android.app.ActivityManager;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.PopupMenu;
 import android.view.KeyEvent;
@@ -97,20 +100,39 @@ public class MainActivity extends AppCompatActivity implements TextView.OnEditor
             @Override
             public void onReceivedTitle(WebView view, String title) {
                 super.onReceivedTitle(view, title);
-                titleTv.setText(title);
+                setTaskTitleAndIcon(title, null);
                 addressBarEt.setText(webView.getUrl());
             }
 
             @Override
             public void onReceivedIcon(WebView view, Bitmap icon) {
                 super.onReceivedIcon(view, icon);
-                if (icon != null) {
-                    iconIv.setImageBitmap(icon);
-                } else {
-                    iconIv.setImageResource(R.drawable.ic_default);
-                }
+                setTaskTitleAndIcon(titleTv.getText().toString(), icon);
             }
         });
+    }
+
+    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
+    private void setTaskTitleAndIcon(String title, @Nullable Bitmap icon) {
+        titleTv.setText(title);
+        setTitle(title);
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
+            ActivityManager.TaskDescription taskDescription;
+
+            if (icon != null) {
+                iconIv.setImageBitmap(icon);
+
+                taskDescription = new ActivityManager.TaskDescription("B: " + title, icon);
+                setTaskDescription(taskDescription);
+            } else {
+                iconIv.setImageResource(R.drawable.ic_default);
+
+                taskDescription = new ActivityManager.TaskDescription("B: " + title);
+                setTaskDescription(taskDescription);
+            }
+
+            setTaskDescription(taskDescription);
+        }
     }
 
     @Override
@@ -173,6 +195,18 @@ public class MainActivity extends AppCompatActivity implements TextView.OnEditor
             case R.id.action_forward:
                 if (webView.canGoForward()) {
                     webView.goForward();
+                }
+                return true;
+
+            case R.id.action_settings:
+                return true;
+
+            case R.id.action_new_tab:
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                    Intent intent = new Intent(this, MainActivity.class);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_MULTIPLE_TASK);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_DOCUMENT);
+                    startActivity(intent);
                 }
                 return true;
         }
