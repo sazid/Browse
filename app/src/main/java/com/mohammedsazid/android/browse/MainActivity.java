@@ -37,7 +37,7 @@ import com.afollestad.materialdialogs.MaterialDialog;
 public class MainActivity extends AppCompatActivity
         implements TextView.OnEditorActionListener, PopupMenu.OnMenuItemClickListener {
 
-    private WebView webView;
+    private VideoEnabledWebView webView;
     private EditText addressBarEt;
     private TextView titleTv;
     private ImageView iconIv;
@@ -55,7 +55,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void bindViews() {
-        webView = (WebView) findViewById(R.id.browse_webview);
+        webView = (VideoEnabledWebView) findViewById(R.id.browse_webview);
         addressBarEt = (EditText) findViewById(R.id.addressbar_et);
         titleTv = (TextView) findViewById(R.id.title_tv);
         iconIv = (ImageView) findViewById(R.id.icon_iv);
