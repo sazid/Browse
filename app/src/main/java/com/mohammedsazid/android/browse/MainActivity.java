@@ -51,7 +51,7 @@ public class MainActivity extends AppCompatActivity
         bindViews();
         setupWebView();
         setupAddressBar();
-//        webView.loadUrl("http://google.com/");
+        checkAndLaunchUrlFromIntent(getIntent());
     }
 
     private void bindViews() {
@@ -61,6 +61,17 @@ public class MainActivity extends AppCompatActivity
         iconIv = (ImageView) findViewById(R.id.icon_iv);
         progressBar = (ProgressBar) findViewById(R.id.progressBar);
         menuButton = (ImageButton) findViewById(R.id.menu_button);
+    }
+
+    private void checkAndLaunchUrlFromIntent(Intent intent) {
+        if (intent != null
+                && intent.getAction() != null
+                && intent.getData() != null
+                && intent.getAction().equals(Intent.ACTION_VIEW)) {
+            loadWebPage(getIntent().getDataString());
+        } else if (TextUtils.isEmpty(webView.getUrl())) {
+            webView.loadUrl("http://google.com/");
+        }
     }
 
     private void setupAddressBar() {
