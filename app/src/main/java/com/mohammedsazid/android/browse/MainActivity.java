@@ -81,7 +81,8 @@ public class MainActivity extends AppCompatActivity
                 && intent.getAction().equals(Intent.ACTION_VIEW)) {
             loadWebPage(getIntent().getDataString());
         } else if (TextUtils.isEmpty(webView.getUrl())) {
-            webView.loadUrl("http://saved.io/");
+            // TODO: Use SharedPreferences for storing user's home page
+//            webView.loadUrl("http://saved.io/");
         }
     }
 
@@ -244,6 +245,18 @@ public class MainActivity extends AppCompatActivity
                 super.onBackPressed();
             }
         }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        webView.onResume();
+    }
+
+    @Override
+    protected void onPause() {
+        webView.onPause();
+        super.onPause();
     }
 
     public void onMenuButtonClick(View v) {

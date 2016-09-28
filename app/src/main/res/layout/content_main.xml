@@ -101,6 +101,7 @@
             android:maxLength="2000"
             android:maxLines="1"
             android:padding="16dp"
+            android:hint="Enter URL or search Google..."
             android:scrollHorizontally="true"
             android:textColor="@android:color/black" />
 
