@@ -81,7 +81,7 @@ public class MainActivity extends AppCompatActivity
                 && intent.getAction().equals(Intent.ACTION_VIEW)) {
             loadWebPage(getIntent().getDataString());
         } else if (TextUtils.isEmpty(webView.getUrl())) {
-            webView.loadUrl("http://google.com/");
+            webView.loadUrl("http://saved.io/");
         }
     }
 
