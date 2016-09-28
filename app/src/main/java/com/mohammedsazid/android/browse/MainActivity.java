@@ -19,6 +19,7 @@ import android.text.TextUtils;
 import android.util.Patterns;
 import android.view.KeyEvent;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
@@ -30,7 +31,8 @@ import android.webkit.WebResourceError;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
-import android.widget.EditText;
+import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
@@ -41,15 +43,19 @@ import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity
         implements TextView.OnEditorActionListener, PopupMenu.OnMenuItemClickListener {
+
+    private List<String> autoCompleteList = new ArrayList<>();
 
     private VideoEnabledWebView webView;
     private View nonVideoLayout;
     private ViewGroup videoLayout;
     private View loadingView;
-    private EditText addressBarEt;
+    private AutoCompleteTextView addressBarEt;
     private TextView titleTv;
     private ImageView iconIv;
     private ProgressBar progressBar;
@@ -63,6 +69,7 @@ public class MainActivity extends AppCompatActivity
         setContentView(R.layout.activity_main);
         bindViews();
         setupWebView();
+        setupAutoCompleteList();
         setupAddressBar();
         checkAndLaunchUrlFromIntent(getIntent());
     }
@@ -71,7 +78,7 @@ public class MainActivity extends AppCompatActivity
         webView = (VideoEnabledWebView) findViewById(R.id.browse_webview);
         nonVideoLayout = findViewById(R.id.nonVideoLayout);
         videoLayout = (ViewGroup) findViewById(R.id.videoLayout);
-        addressBarEt = (EditText) findViewById(R.id.addressbar_et);
+        addressBarEt = (AutoCompleteTextView) findViewById(R.id.addressbar_et);
         titleTv = (TextView) findViewById(R.id.title_tv);
         iconIv = (ImageView) findViewById(R.id.icon_iv);
         progressBar = (ProgressBar) findViewById(R.id.progressBar);
@@ -92,8 +99,26 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
+    private void setupAutoCompleteList() {
+        autoCompleteList.add("animeheaven.eu");
+        autoCompleteList.add("gmail.com");
+        autoCompleteList.add("webtoons.com");
+        autoCompleteList.add("google.com");
+        autoCompleteList.add("facebook.com");
+        autoCompleteList.add("twitter.com");
+        autoCompleteList.add("youtube.com");
+        autoCompleteList.add("keep.google.com");
+        autoCompleteList.add("saved.io");
+    }
+
     private void setupAddressBar() {
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(
+                this, android.R.layout.simple_list_item_1, autoCompleteList);
+        addressBarEt.setAdapter(adapter);
+
         addressBarEt.setOnEditorActionListener(this);
+        addressBarEt.setFocusable(true);
+        addressBarEt.setFocusableInTouchMode(true);
         addressBarEt.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
             public void onFocusChange(View v, boolean hasFocus) {
@@ -168,6 +193,15 @@ public class MainActivity extends AppCompatActivity
                     showSystemUI();
 //                    getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_VISIBLE);
                 }
+            }
+        });
+
+        webView.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+                webView.requestFocus();
+                hideKeyboard();
+                return false;
             }
         });
 
@@ -256,12 +290,16 @@ public class MainActivity extends AppCompatActivity
     public boolean onEditorAction(TextView textView, int actionId, KeyEvent keyEvent) {
         if (actionId == EditorInfo.IME_ACTION_GO) {
             loadWebPage(textView.getText().toString());
-            InputMethodManager imm = (InputMethodManager)
-                    getSystemService(Context.INPUT_METHOD_SERVICE);
-            imm.hideSoftInputFromWindow(textView.getWindowToken(), 0);
+            hideKeyboard();
         }
 
         return true;
+    }
+
+    private void hideKeyboard() {
+        InputMethodManager imm = (InputMethodManager)
+                getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm.hideSoftInputFromWindow(getWindow().getDecorView().getWindowToken(), 0);
     }
 
     private void loadWebPage(String queryOrUrl) {
