@@ -40,6 +40,8 @@ import android.widget.Toast;
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
 
+import java.io.File;
+
 public class MainActivity extends AppCompatActivity
         implements TextView.OnEditorActionListener, PopupMenu.OnMenuItemClickListener {
 
@@ -107,8 +109,16 @@ public class MainActivity extends AppCompatActivity
         webView.getSettings().setSupportZoom(true);
         webView.getSettings().setBuiltInZoomControls(true);
         webView.getSettings().setDisplayZoomControls(false);
+        webView.getSettings().setAllowFileAccess(true);
+        webView.getSettings().setDomStorageEnabled(true);
+        webView.getSettings().setAppCacheEnabled(true);
+        webView.getSettings().setAppCachePath(getCacheDir().getAbsolutePath()
+                + File.pathSeparator + "appCache" + File.pathSeparator);
+        webView.getSettings().setDatabaseEnabled(true);
+        webView.setSaveEnabled(true);
 
         webChromeClient = new VideoEnabledWebChromeClient(nonVideoLayout, videoLayout, loadingView, webView) {
+
             @Override
             public void onProgressChanged(WebView view, int newProgress) {
                 if (newProgress == 100) {
@@ -255,6 +265,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void loadWebPage(String queryOrUrl) {
+        queryOrUrl = queryOrUrl.trim();
         boolean isUrl = Patterns.WEB_URL.matcher(queryOrUrl).matches();
         if (isUrl) {
             Uri url = Uri.parse(queryOrUrl);
