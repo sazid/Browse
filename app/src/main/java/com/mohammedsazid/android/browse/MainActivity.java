@@ -371,7 +371,7 @@ public class MainActivity extends AppCompatActivity
         // Thanks http://stackoverflow.com/a/33681975/1815624
         public boolean shouldOverrideUrlLoading(WebView view, String url) {
             view.loadUrl(url);
-            return true;
+            return super.shouldOverrideUrlLoading(view, url);
         }
 
         @Override
