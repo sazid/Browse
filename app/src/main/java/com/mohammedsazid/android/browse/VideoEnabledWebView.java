@@ -121,4 +121,21 @@ public class VideoEnabledWebView extends WebView {
         }
     }
 
+    private IOnScrollListener onScrollListener;
+
+    public void setOnScrollListener(IOnScrollListener onScrollListener) {
+        this.onScrollListener = onScrollListener;
+    }
+
+    @Override
+    protected void onScrollChanged(int l, int t, int oldl, int oldt) {
+        super.onScrollChanged(l, t, oldl, oldt);
+        if (onScrollListener != null) {
+            onScrollListener.onScrollChanged(l, t, oldl, oldt);
+        }
+    }
+
+    public interface IOnScrollListener {
+        void onScrollChanged(int scrollX, int scrollY, int oldScrollX, int oldScrollY);
+    }
 }

@@ -60,6 +60,8 @@ public class MainActivity extends AppCompatActivity
     private ImageView iconIv;
     private ProgressBar progressBar;
     private ImageButton menuButton;
+    private View bottomBar;
+    private View barContainer;
 
     private VideoEnabledWebChromeClient webChromeClient;
 
@@ -83,6 +85,8 @@ public class MainActivity extends AppCompatActivity
         iconIv = (ImageView) findViewById(R.id.icon_iv);
         progressBar = (ProgressBar) findViewById(R.id.progressBar);
         menuButton = (ImageButton) findViewById(R.id.menu_button);
+        bottomBar = findViewById(R.id.bottom_bar);
+        barContainer = findViewById(R.id.bar_container);
 
         loadingView = getLayoutInflater().inflate(R.layout.view_loading_video, null);
     }
@@ -230,6 +234,21 @@ public class MainActivity extends AppCompatActivity
                     Toast.makeText(getApplicationContext(), "Please enable STORAGE permission!",
                             Toast.LENGTH_LONG).show();
                     openAppDetailsIntent(MainActivity.this, getPackageName());
+                }
+            }
+        });
+
+        webView.setOnScrollListener(new VideoEnabledWebView.IOnScrollListener() {
+            @Override
+            public void onScrollChanged(int scrollX, int scrollY, int oldScrollX, int oldScrollY) {
+                if (scrollY - oldScrollY > 0) {
+                    // scrolling down
+                    bottomBar.animate().translationY(bottomBar.getHeight() - barContainer.getHeight());
+                    webView.animate().scaleY(bottomBar.getHeight() - barContainer.getHeight());
+                } else {
+                    // scrolling up
+                    bottomBar.animate().translationY(0);
+                    webView.animate().scaleY(0);
                 }
             }
         });
