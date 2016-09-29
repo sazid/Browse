@@ -11,6 +11,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
@@ -45,11 +46,16 @@ import com.afollestad.materialdialogs.MaterialDialog;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 public class MainActivity extends AppCompatActivity
         implements TextView.OnEditorActionListener, PopupMenu.OnMenuItemClickListener {
 
+    private static final long UI_HIDE_DELAY = TimeUnit.SECONDS.toMillis(3);
+
     private List<String> autoCompleteList = new ArrayList<>();
+    private Handler handler = new Handler();
+    private Runnable uiHiderRunnable;
 
     private VideoEnabledWebView webView;
     private View nonVideoLayout;
@@ -72,6 +78,7 @@ public class MainActivity extends AppCompatActivity
         setupWebView();
         setupAutoCompleteList();
         setupAddressBar();
+        prepareUiHiderRunnable();
         checkAndLaunchUrlFromIntent(getIntent());
     }
 
@@ -87,6 +94,38 @@ public class MainActivity extends AppCompatActivity
         bottomBar = findViewById(R.id.bottom_bar);
 
         loadingView = getLayoutInflater().inflate(R.layout.view_loading_video, null);
+    }
+
+    private void prepareUiHiderRunnable() {
+        uiHiderRunnable = new Runnable() {
+            @Override
+            public void run() {
+                if (webView.hasFocus()) {
+                    bottomBar.animate()
+                            .setDuration(200)
+                            .translationY(bottomBar.getMeasuredHeight())
+                            .start();
+                } else {
+                    handler.postDelayed(uiHiderRunnable, UI_HIDE_DELAY);
+                }
+            }
+        };
+    }
+
+    private void hideUi() {
+        handler.removeCallbacks(uiHiderRunnable);
+        handler.postDelayed(uiHiderRunnable, UI_HIDE_DELAY);
+    }
+
+    private void showUi() {
+        if (bottomBar.getTranslationY() != 0) {
+            bottomBar.animate()
+                    .setDuration(200)
+                    .translationY(0)
+                    .start();
+        }
+
+        hideUi();
     }
 
     private void checkAndLaunchUrlFromIntent(Intent intent) {
@@ -239,20 +278,11 @@ public class MainActivity extends AppCompatActivity
             }
         });
 
-        webView.setOnScrollListener(new VideoEnabledWebView.IOnScrollListener() {
+        webView.setOnTouchListener(new View.OnTouchListener() {
             @Override
-            public void onScrollChanged(int scrollX, int scrollY, int oldScrollX, int oldScrollY) {
-                if (scrollY - oldScrollY > 0) {
-                    bottomBar.animate()
-                            .setDuration(200)
-                            .translationY(bottomBar.getMeasuredHeight())
-                            .start();
-                } else {
-                    bottomBar.animate()
-                            .setDuration(200)
-                            .translationY(0)
-                            .start();
-                }
+            public boolean onTouch(View v, MotionEvent event) {
+                showUi();
+                return false;
             }
         });
 
