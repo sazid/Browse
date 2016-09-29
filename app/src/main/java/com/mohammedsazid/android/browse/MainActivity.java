@@ -240,11 +240,37 @@ public class MainActivity extends AppCompatActivity
             }
         });
 
-        webView.setOnTouchListener(new View.OnTouchListener() {
+        final Runnable uiTouchDelay = new Runnable() {
             @Override
-            public boolean onTouch(View view, MotionEvent motionEvent) {
+            public void run() {
                 webView.requestFocus();
                 hideKeyboard();
+            }
+        };
+
+        webView.setOnTouchListener(new View.OnTouchListener() {
+            private float startX;
+            private float startY;
+
+            @Override
+            public boolean onTouch(View view, MotionEvent event) {
+                switch (event.getAction()) {
+                    case MotionEvent.ACTION_DOWN:
+                        startX = event.getX();
+                        startY = event.getY();
+                        break;
+                    case MotionEvent.ACTION_UP: {
+                        float endX = event.getX();
+                        float endY = event.getY();
+                        if (isAClick(startX, endX, startY, endY)) {
+                            hideKeyboard();
+                            webView.requestFocus();
+                        } else {
+                            showUi();
+                        }
+                        break;
+                    }
+                }
                 return false;
             }
         });
@@ -278,16 +304,15 @@ public class MainActivity extends AppCompatActivity
             }
         });
 
-        webView.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                showUi();
-                return false;
-            }
-        });
-
         webView.setWebChromeClient(webChromeClient);
         webView.setWebViewClient(new InsideWebViewClient(this));
+    }
+
+    private boolean isAClick(float startX, float endX, float startY, float endY) {
+        int CLICK_ACTION_THRESHOLD = 5;
+        float differenceX = Math.abs(startX - endX);
+        float differenceY = Math.abs(startY - endY);
+        return !(differenceX > CLICK_ACTION_THRESHOLD || differenceY > CLICK_ACTION_THRESHOLD);
     }
 
     public static void openAppDetailsIntent(Context context, String packageName) {
