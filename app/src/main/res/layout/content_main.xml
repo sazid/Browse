@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nonVideoLayout"
     android:layout_width="match_parent"
@@ -11,8 +11,7 @@
     <com.mohammedsazid.android.browse.VideoEnabledWebView
         android:id="@+id/browse_webView"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
+        android:layout_height="match_parent"
         android:fadeScrollbars="true"
         android:scrollbars="vertical|horizontal" />
 
@@ -20,6 +19,7 @@
         android:id="@+id/bottom_bar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
         android:orientation="vertical">
 
         <View
@@ -43,7 +43,7 @@
                     android:id="@+id/icon_iv"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:scaleType="fitCenter" />
+                    android:scaleType="fitXY" />
 
                 <ProgressBar
                     android:id="@+id/progressBar"
@@ -110,4 +110,4 @@
 
     </LinearLayout>
 
-</LinearLayout>
+</FrameLayout>

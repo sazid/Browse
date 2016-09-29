@@ -242,14 +242,16 @@ public class MainActivity extends AppCompatActivity
         webView.setOnScrollListener(new VideoEnabledWebView.IOnScrollListener() {
             @Override
             public void onScrollChanged(int scrollX, int scrollY, int oldScrollX, int oldScrollY) {
-                if (scrollY - oldScrollY > 8) {
-                    if (bottomBar.getVisibility() != View.GONE) {
-                        bottomBar.setVisibility(View.GONE);
-                    }
-                } else if (scrollY - oldScrollY < -8) {
-                    if (bottomBar.getVisibility() != View.VISIBLE) {
-                        bottomBar.setVisibility(View.VISIBLE);
-                    }
+                if (scrollY - oldScrollY > 0) {
+                    bottomBar.animate()
+                            .setDuration(200)
+                            .translationY(bottomBar.getMeasuredHeight())
+                            .start();
+                } else {
+                    bottomBar.animate()
+                            .setDuration(200)
+                            .translationY(0)
+                            .start();
                 }
             }
         });
