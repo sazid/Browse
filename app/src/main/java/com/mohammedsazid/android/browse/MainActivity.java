@@ -18,6 +18,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.PopupMenu;
 import android.text.TextUtils;
 import android.util.Patterns;
+import android.view.ContextMenu;
 import android.view.KeyEvent;
 import android.view.MenuItem;
 import android.view.MotionEvent;
@@ -49,7 +50,7 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 public class MainActivity extends AppCompatActivity
-        implements TextView.OnEditorActionListener, PopupMenu.OnMenuItemClickListener {
+        implements TextView.OnEditorActionListener, MenuItem.OnMenuItemClickListener {
 
     private static final long UI_HIDE_DELAY = TimeUnit.SECONDS.toMillis(3);
 
@@ -194,6 +195,8 @@ public class MainActivity extends AppCompatActivity
 
         webView.setWebChromeClient(webChromeClient);
         webView.setWebViewClient(new InsideWebViewClient(this));
+
+        registerForContextMenu(webView);
     }
 
     private boolean isAClick(float startX, float endX, float startY, float endY) {
@@ -224,6 +227,49 @@ public class MainActivity extends AppCompatActivity
             flags |= View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY;
         }
         getWindow().getDecorView().setSystemUiVisibility(flags);
+    }
+
+    public static final int ID_SAVE_IMAGE = 1;
+    public static final int ID_OPEN_IMAGE = 2;
+    public static final int ID_OPEN_IMAGE_IN_NEW_WINDOW = 3;
+    public static final int ID_SAVE_LINK = 4;
+    public static final int ID_COPY_LINK = 5;
+    public static final int ID_SHARE_LINK = 6;
+    public static final int ID_OPEN_LINK_IN_NEW_WINDOW = 7;
+
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
+        super.onCreateContextMenu(menu, v, menuInfo);
+
+        WebView.HitTestResult hitTestResult = webView.getHitTestResult();
+
+        switch (hitTestResult.getType()) {
+            case WebView.HitTestResult.IMAGE_TYPE:
+                menu.setHeaderTitle(hitTestResult.getExtra());
+                menu.add(0, ID_SAVE_IMAGE, 0, "Save image").setOnMenuItemClickListener(this);
+                menu.add(0, ID_OPEN_IMAGE, 1, "Open image").setOnMenuItemClickListener(this);
+                menu.add(0, ID_OPEN_IMAGE_IN_NEW_WINDOW, 2, "Open image in new window").setOnMenuItemClickListener(this);
+                break;
+            case WebView.HitTestResult.SRC_IMAGE_ANCHOR_TYPE:
+                menu.setHeaderTitle(hitTestResult.getExtra());
+                menu.add(0, ID_COPY_LINK, 0, "Copy link").setOnMenuItemClickListener(this);
+                menu.add(0, ID_SHARE_LINK, 1, "Share link").setOnMenuItemClickListener(this);
+                menu.add(0, ID_SAVE_LINK, 2, "Save link").setOnMenuItemClickListener(this);
+                menu.add(0, ID_OPEN_LINK_IN_NEW_WINDOW, 3, "Open link in new window")
+                        .setOnMenuItemClickListener(this);
+                menu.add(0, ID_OPEN_IMAGE, 4, "Open image").setOnMenuItemClickListener(this);
+                menu.add(0, ID_OPEN_IMAGE_IN_NEW_WINDOW, 5, "Open image in new window").setOnMenuItemClickListener(this);
+                menu.add(0, ID_SAVE_IMAGE, 6, "Save image").setOnMenuItemClickListener(this);
+                break;
+            case WebView.HitTestResult.SRC_ANCHOR_TYPE:
+                menu.setHeaderTitle(hitTestResult.getExtra());
+                menu.add(0, ID_COPY_LINK, 0, "Copy link").setOnMenuItemClickListener(this);
+                menu.add(0, ID_SHARE_LINK, 1, "Share link").setOnMenuItemClickListener(this);
+                menu.add(0, ID_SAVE_LINK, 2, "Save link").setOnMenuItemClickListener(this);
+                menu.add(0, ID_OPEN_LINK_IN_NEW_WINDOW, 3, "Open link in new window")
+                        .setOnMenuItemClickListener(this);
+                break;
+        }
     }
 
     // This snippet shows the system bars. It does this by removing all the flags
@@ -328,7 +374,7 @@ public class MainActivity extends AppCompatActivity
         PopupMenu popup = new PopupMenu(this, v);
         popup.getMenuInflater()
                 .inflate(R.menu.menu_main, popup.getMenu());
-        popup.setOnMenuItemClickListener(this);
+        popup.setOnMenuItemClickListener((PopupMenu.OnMenuItemClickListener) this);
 
         // force shows popup menu icons
 //        try {
@@ -499,7 +545,11 @@ public class MainActivity extends AppCompatActivity
 
     class CustomWebChromeClient extends VideoEnabledWebChromeClient {
         @SuppressWarnings("unused")
-        public CustomWebChromeClient(Activity activity, View activityNonVideoView, ViewGroup activityVideoView, View loadingView, VideoEnabledWebView webView) {
+        public CustomWebChromeClient(
+                Activity activity,
+                View activityNonVideoView,
+                ViewGroup activityVideoView,
+                View loadingView, VideoEnabledWebView webView) {
             super(activity, activityNonVideoView, activityVideoView, loadingView, webView);
         }
 
