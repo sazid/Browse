@@ -1,11 +1,20 @@
 package com.mohammedsazid.android.browse;
 
+import android.app.Activity;
+import android.content.ActivityNotFoundException;
+import android.content.Intent;
 import android.media.MediaPlayer;
+import android.net.Uri;
+import android.os.Build;
+import android.support.annotation.RequiresApi;
 import android.view.SurfaceView;
 import android.view.View;
 import android.view.ViewGroup;
+import android.webkit.ValueCallback;
 import android.webkit.WebChromeClient;
+import android.webkit.WebView;
 import android.widget.FrameLayout;
+import android.widget.Toast;
 
 /**
  * This class serves as a WebChromeClient to be set to a WebView, allowing it to play video.
@@ -23,10 +32,18 @@ import android.widget.FrameLayout;
  *
  * @author Cristian Perez (http://cpr.name)
  */
+@SuppressWarnings("WeakerAccess")
 public class VideoEnabledWebChromeClient extends WebChromeClient implements MediaPlayer.OnPreparedListener, MediaPlayer.OnCompletionListener, MediaPlayer.OnErrorListener {
     public interface ToggledFullscreenCallback {
         void toggledFullscreen(boolean fullscreen);
     }
+
+    private Activity activity;
+
+    private ValueCallback<Uri> mUploadMessage;
+    public ValueCallback<Uri[]> uploadMessage;
+    public static final int REQUEST_SELECT_FILE = 100;
+    private final static int FILECHOOSER_RESULTCODE = 1;
 
     private View activityNonVideoView;
     private ViewGroup activityVideoView;
@@ -88,12 +105,13 @@ public class VideoEnabledWebChromeClient extends WebChromeClient implements Medi
      *                             Note: The web page must only contain one video tag in order for the HTML5 video ended event to work. This could be improved if needed (see Javascript code).
      */
     @SuppressWarnings("unused")
-    public VideoEnabledWebChromeClient(View activityNonVideoView, ViewGroup activityVideoView, View loadingView, VideoEnabledWebView webView) {
+    public VideoEnabledWebChromeClient(Activity activity, View activityNonVideoView, ViewGroup activityVideoView, View loadingView, VideoEnabledWebView webView) {
         this.activityNonVideoView = activityNonVideoView;
         this.activityVideoView = activityVideoView;
         this.loadingView = loadingView;
         this.webView = webView;
         this.isVideoFullscreen = false;
+        this.activity = activity;
     }
 
     /**
@@ -254,6 +272,74 @@ public class VideoEnabledWebChromeClient extends WebChromeClient implements Medi
             return true;
         } else {
             return false;
+        }
+    }
+
+    // For 3.0+ Devices (Start)
+    // onActivityResult attached before constructor
+    protected void openFileChooser(ValueCallback uploadMsg, String acceptType) {
+        mUploadMessage = uploadMsg;
+        Intent i = new Intent(Intent.ACTION_GET_CONTENT);
+        i.addCategory(Intent.CATEGORY_OPENABLE);
+        i.setType("*/*");
+        activity.startActivityForResult(Intent.createChooser(i, "File chooser"), FILECHOOSER_RESULTCODE);
+    }
+
+
+    // For Lollipop 5.0+ Devices
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+    public boolean onShowFileChooser(WebView mWebView, ValueCallback<Uri[]> filePathCallback, WebChromeClient.FileChooserParams fileChooserParams) {
+        if (uploadMessage != null) {
+            uploadMessage.onReceiveValue(null);
+            uploadMessage = null;
+        }
+
+        uploadMessage = filePathCallback;
+
+        Intent intent = fileChooserParams.createIntent();
+        try {
+            activity.startActivityForResult(intent, REQUEST_SELECT_FILE);
+        } catch (ActivityNotFoundException e) {
+            uploadMessage = null;
+            Toast.makeText(webView.getContext(), "Cannot open File Chooser", Toast.LENGTH_LONG).show();
+            return false;
+        }
+        return true;
+    }
+
+    //For Android 4.1 only
+    protected void openFileChooser(ValueCallback<Uri> uploadMsg, String acceptType, String capture) {
+        mUploadMessage = uploadMsg;
+        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+        intent.addCategory(Intent.CATEGORY_OPENABLE);
+        intent.setType("*/*");
+        activity.startActivityForResult(Intent.createChooser(intent, "File chooser"), FILECHOOSER_RESULTCODE);
+    }
+
+    protected void openFileChooser(ValueCallback<Uri> uploadMsg) {
+        mUploadMessage = uploadMsg;
+        Intent i = new Intent(Intent.ACTION_GET_CONTENT);
+        i.addCategory(Intent.CATEGORY_OPENABLE);
+        i.setType("*/*");
+        activity.startActivityForResult(Intent.createChooser(i, "File chooser"), FILECHOOSER_RESULTCODE);
+    }
+
+    public void onActivityResult(int requestCode, int resultCode, Intent intent) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            if (requestCode == REQUEST_SELECT_FILE) {
+                if (uploadMessage == null)
+                    return;
+                uploadMessage.onReceiveValue(WebChromeClient.FileChooserParams.parseResult(resultCode, intent));
+                uploadMessage = null;
+            }
+        } else if (requestCode == FILECHOOSER_RESULTCODE) {
+            if (null == mUploadMessage)
+                return;
+            Uri result = intent == null || resultCode != Activity.RESULT_OK ? null : intent.getData();
+            mUploadMessage.onReceiveValue(result);
+            mUploadMessage = null;
+        } else {
+            Toast.makeText(webView.getContext(), "Failed to upload file", Toast.LENGTH_LONG).show();
         }
     }
 
