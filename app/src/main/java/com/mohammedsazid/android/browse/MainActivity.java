@@ -61,7 +61,6 @@ public class MainActivity extends AppCompatActivity
     private ProgressBar progressBar;
     private ImageButton menuButton;
     private View bottomBar;
-    private View barContainer;
 
     private VideoEnabledWebChromeClient webChromeClient;
 
@@ -77,16 +76,15 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void bindViews() {
-        webView = (VideoEnabledWebView) findViewById(R.id.browse_webview);
+        webView = (VideoEnabledWebView) findViewById(R.id.browse_webView);
         nonVideoLayout = findViewById(R.id.nonVideoLayout);
         videoLayout = (ViewGroup) findViewById(R.id.videoLayout);
-        addressBarEt = (AutoCompleteTextView) findViewById(R.id.addressbar_et);
+        addressBarEt = (AutoCompleteTextView) findViewById(R.id.addressBar_et);
         titleTv = (TextView) findViewById(R.id.title_tv);
         iconIv = (ImageView) findViewById(R.id.icon_iv);
         progressBar = (ProgressBar) findViewById(R.id.progressBar);
         menuButton = (ImageButton) findViewById(R.id.menu_button);
         bottomBar = findViewById(R.id.bottom_bar);
-        barContainer = findViewById(R.id.bar_container);
 
         loadingView = getLayoutInflater().inflate(R.layout.view_loading_video, null);
     }
@@ -164,6 +162,9 @@ public class MainActivity extends AppCompatActivity
                 super.onReceivedTitle(view, title);
                 setTaskTitleAndIcon(title, null);
                 addressBarEt.setText(webView.getUrl());
+                if (bottomBar.getVisibility() != View.VISIBLE) {
+                    bottomBar.setVisibility(View.VISIBLE);
+                }
             }
 
             @Override
@@ -241,14 +242,14 @@ public class MainActivity extends AppCompatActivity
         webView.setOnScrollListener(new VideoEnabledWebView.IOnScrollListener() {
             @Override
             public void onScrollChanged(int scrollX, int scrollY, int oldScrollX, int oldScrollY) {
-                if (scrollY - oldScrollY > 0) {
-                    // scrolling down
-                    bottomBar.animate().translationY(bottomBar.getHeight() - barContainer.getHeight());
-                    webView.animate().scaleY(bottomBar.getHeight() - barContainer.getHeight());
-                } else {
-                    // scrolling up
-                    bottomBar.animate().translationY(0);
-                    webView.animate().scaleY(0);
+                if (scrollY - oldScrollY > 8) {
+                    if (bottomBar.getVisibility() != View.GONE) {
+                        bottomBar.setVisibility(View.GONE);
+                    }
+                } else if (scrollY - oldScrollY < -8) {
+                    if (bottomBar.getVisibility() != View.VISIBLE) {
+                        bottomBar.setVisibility(View.VISIBLE);
+                    }
                 }
             }
         });
@@ -514,6 +515,12 @@ public class MainActivity extends AppCompatActivity
                     Toast.LENGTH_SHORT
             ).show();
             super.onReceivedError(view, request, error);
+        }
+
+        @Override
+        public void onPageStarted(WebView view, String url, Bitmap favicon) {
+            super.onPageStarted(view, url, favicon);
+            webView.requestFocus();
         }
     }
 

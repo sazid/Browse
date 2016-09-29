@@ -9,7 +9,7 @@
     tools:showIn="@layout/activity_main">
 
     <com.mohammedsazid.android.browse.VideoEnabledWebView
-        android:id="@+id/browse_webview"
+        android:id="@+id/browse_webView"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
@@ -28,92 +28,83 @@
             android:background="@drawable/toolbar_separator" />
 
         <LinearLayout
-            android:id="@+id/bar_container"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:background="@android:color/white"
+            android:orientation="horizontal">
 
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="@android:color/white"
-                android:orientation="horizontal">
+            <FrameLayout
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_gravity="center"
+                android:padding="2dp">
 
-                <FrameLayout
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:layout_gravity="center"
-                    android:padding="2dp">
-
-                    <ImageView
-                        android:id="@+id/icon_iv"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:scaleType="fitCenter" />
-
-                    <ProgressBar
-                        android:id="@+id/progressBar"
-                        style="?android:attr/progressBarStyleSmall"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:background="@android:color/white"
-                        android:indeterminate="true"
-                        android:indeterminateOnly="true"
-                        android:visibility="invisible" />
-
-                </FrameLayout>
-
-                <TextView
-                    android:id="@+id/title_tv"
-                    android:layout_width="0dp"
+                <ImageView
+                    android:id="@+id/icon_iv"
+                    android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:layout_weight="1"
-                    android:ellipsize="end"
-                    android:gravity="center_vertical"
-                    android:maxLines="1"
-                    android:paddingEnd="4dp"
-                    android:paddingLeft="4dp"
-                    android:paddingRight="4dp"
-                    android:paddingStart="4dp"
-                    android:text=""
-                    android:textAppearance="?android:attr/textAppearanceSmall"
-                    android:textColor="@android:color/black" />
+                    android:scaleType="fitCenter" />
 
-            </LinearLayout>
-
-            <LinearLayout
-                android:id="@+id/navbar"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="@android:color/white"
-                android:gravity="center_vertical"
-                android:orientation="horizontal">
-
-                <AutoCompleteTextView
-                    android:id="@+id/addressbar_et"
-                    android:layout_width="0dp"
+                <ProgressBar
+                    android:id="@+id/progressBar"
+                    style="?android:attr/progressBarStyleSmall"
+                    android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:layout_weight="1"
                     android:background="@android:color/white"
-                    android:hint="Enter URL or search Google..."
-                    android:imeOptions="actionGo"
-                    android:inputType="text|textUri"
-                    android:maxLength="2000"
-                    android:maxLines="1"
-                    android:padding="16dp"
-                    android:scrollHorizontally="true"
-                    android:textColor="@android:color/black" />
+                    android:indeterminate="true"
+                    android:indeterminateOnly="true"
+                    android:visibility="invisible" />
 
-                <ImageButton
-                    android:id="@+id/menu_button"
-                    android:layout_width="58dp"
-                    android:layout_height="58dp"
-                    android:background="?android:selectableItemBackground"
-                    android:clickable="true"
-                    android:onClick="onMenuButtonClick"
-                    android:src="@drawable/ic_more" />
+            </FrameLayout>
 
-            </LinearLayout>
+            <TextView
+                android:id="@+id/title_tv"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:ellipsize="end"
+                android:gravity="center_vertical"
+                android:maxLines="1"
+                android:paddingEnd="4dp"
+                android:paddingLeft="4dp"
+                android:paddingRight="4dp"
+                android:paddingStart="4dp"
+                android:text=""
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:textColor="@android:color/black" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@android:color/white"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <AutoCompleteTextView
+                android:id="@+id/addressBar_et"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="@android:color/white"
+                android:hint="Enter URL or search Google..."
+                android:imeOptions="actionGo"
+                android:inputType="text|textUri"
+                android:maxLength="2000"
+                android:maxLines="1"
+                android:padding="16dp"
+                android:scrollHorizontally="true"
+                android:textColor="@android:color/black" />
+
+            <ImageButton
+                android:id="@+id/menu_button"
+                android:layout_width="58dp"
+                android:layout_height="58dp"
+                android:background="?android:selectableItemBackground"
+                android:clickable="true"
+                android:onClick="onMenuButtonClick"
+                android:src="@drawable/ic_more" />
 
         </LinearLayout>
 
