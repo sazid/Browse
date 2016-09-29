@@ -1,9 +1,11 @@
 package com.mohammedsazid.android.browse;
 
+import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.ActivityManager;
 import android.app.DownloadManager;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -50,7 +52,7 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 public class MainActivity extends AppCompatActivity
-        implements TextView.OnEditorActionListener, MenuItem.OnMenuItemClickListener {
+        implements TextView.OnEditorActionListener, PopupMenu.OnMenuItemClickListener, MenuItem.OnMenuItemClickListener {
 
     private static final long UI_HIDE_DELAY = TimeUnit.SECONDS.toMillis(3);
 
@@ -374,7 +376,7 @@ public class MainActivity extends AppCompatActivity
         PopupMenu popup = new PopupMenu(this, v);
         popup.getMenuInflater()
                 .inflate(R.menu.menu_main, popup.getMenu());
-        popup.setOnMenuItemClickListener((PopupMenu.OnMenuItemClickListener) this);
+        popup.setOnMenuItemClickListener(this);
 
         // force shows popup menu icons
 //        try {
@@ -390,6 +392,8 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public boolean onMenuItemClick(MenuItem item) {
+        WebView.HitTestResult hitTestResult = webView.getHitTestResult();
+
         switch (item.getItemId()) {
             case R.id.action_stop:
                 webView.stopLoading();
@@ -423,11 +427,97 @@ public class MainActivity extends AppCompatActivity
                 return true;
 
             case R.id.action_share:
-                shareUrl();
+                shareUrl(webView.getUrl());
+                return true;
+
+            // --- WebView context menu items --- //
+            case ID_SAVE_IMAGE:
+                // this will fail in several occasion
+                // TODO: 9/30/16 http://stackoverflow.com/questions/3474448/saving-image-webview-android/3475772#3475772
+                downloadFile(hitTestResult.getExtra(),
+                        Uri.parse(hitTestResult.getExtra())
+                                .getLastPathSegment());
+                return true;
+
+            case ID_OPEN_IMAGE:
+                loadWebPage(hitTestResult.getExtra());
+                return true;
+
+            case ID_SAVE_LINK:
+                downloadFile(hitTestResult.getExtra(),
+                        Uri.parse(hitTestResult.getExtra())
+                                .getLastPathSegment());
+                return true;
+
+            case ID_SHARE_LINK:
+                shareUrl(hitTestResult.getExtra());
+                return true;
+
+            case ID_COPY_LINK:
+                copyToClipboard(this, hitTestResult.getExtra());
+                Toast.makeText(this, "Copied to clipboard", Toast.LENGTH_SHORT).show();
+                return true;
+
+            case ID_OPEN_IMAGE_IN_NEW_WINDOW:
+            case ID_OPEN_LINK_IN_NEW_WINDOW:
+//                Intent newWindowIntent = new Intent(this, MainActivity.class);
+                Intent newWindowIntent = new Intent(
+                        Intent.ACTION_VIEW, Uri.parse(hitTestResult.getExtra()));
+                newWindowIntent.setComponent(new ComponentName(this, MainActivity.class));
+                startActivity(newWindowIntent);
                 return true;
         }
 
         return false;
+    }
+
+    @SuppressLint("NewApi")
+    @SuppressWarnings("deprecation")
+    public boolean copyToClipboard(Context context, String text) {
+        try {
+            int sdk = android.os.Build.VERSION.SDK_INT;
+            if (sdk < android.os.Build.VERSION_CODES.HONEYCOMB) {
+                android.text.ClipboardManager clipboard = (android.text.ClipboardManager) context
+                        .getSystemService(Context.CLIPBOARD_SERVICE);
+                clipboard.setText(text);
+            } else {
+                android.content.ClipboardManager clipboard = (android.content.ClipboardManager) context
+                        .getSystemService(Context.CLIPBOARD_SERVICE);
+                android.content.ClipData clip = android.content.ClipData
+                        .newPlainText(
+                                context.getResources().getString(
+                                        R.string.app_name), text);
+                clipboard.setPrimaryClip(clip);
+            }
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    private void downloadFile(String url, String fileName) {
+//        String fileName = Uri.parse(url).getLastPathSegment();
+
+        try {
+            DownloadManager.Request request = new DownloadManager.Request(
+                    Uri.parse(url));
+
+            request.allowScanningByMediaScanner();
+            request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
+            request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, fileName);
+            DownloadManager dm = (DownloadManager) getSystemService(DOWNLOAD_SERVICE);
+
+            dm.enqueue(request);
+            Toast.makeText(getApplicationContext(), "Downloading file...",
+                    Toast.LENGTH_LONG).show();
+        } catch (SecurityException e) {
+            Toast.makeText(getApplicationContext(), "Please enable STORAGE permission!",
+                    Toast.LENGTH_LONG).show();
+            openAppDetailsIntent(MainActivity.this, getPackageName());
+        } catch (Exception e) {
+            Toast.makeText(getApplicationContext(), "Failed to download file",
+                    Toast.LENGTH_LONG).show();
+        }
     }
 
     private void composeEmail(String[] addresses, String subject, String body) {
@@ -460,11 +550,11 @@ public class MainActivity extends AppCompatActivity
                 .show();
     }
 
-    private void shareUrl() {
+    private void shareUrl(String url) {
         Intent i = new Intent(Intent.ACTION_SEND);
         i.setType("text/plain");
 //        i.putExtra(Intent.EXTRA_SUBJECT, "Sharing URL");
-        i.putExtra(Intent.EXTRA_TEXT, webView.getUrl());
+        i.putExtra(Intent.EXTRA_TEXT, url);
         startActivity(Intent.createChooser(i, "Share URL"));
     }
 
@@ -588,30 +678,14 @@ public class MainActivity extends AppCompatActivity
 
     class CustomDownloadListener implements DownloadListener {
         public void onDownloadStart(String url, String userAgent,
-                                    String contentDisposition, String mimetype,
+                                    String contentDisposition, String mimeType,
                                     long contentLength) {
 //                Intent i = new Intent(Intent.ACTION_VIEW);
 //                i.setData(Uri.parse(url));
 //                startActivity(i);
 
-            String fileName = URLUtil.guessFileName(url, contentDisposition, mimetype);
-
-            DownloadManager.Request request = new DownloadManager.Request(
-                    Uri.parse(url));
-            request.allowScanningByMediaScanner();
-            request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
-            request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, fileName);
-            DownloadManager dm = (DownloadManager) getSystemService(DOWNLOAD_SERVICE);
-
-            try {
-                dm.enqueue(request);
-                Toast.makeText(getApplicationContext(), "Downloading file...",
-                        Toast.LENGTH_LONG).show();
-            } catch (SecurityException e) {
-                Toast.makeText(getApplicationContext(), "Please enable STORAGE permission!",
-                        Toast.LENGTH_LONG).show();
-                openAppDetailsIntent(MainActivity.this, getPackageName());
-            }
+            String fileName = URLUtil.guessFileName(url, contentDisposition, mimeType);
+            downloadFile(url, fileName);
         }
     }
 
