@@ -250,26 +250,37 @@ public class MainActivity extends AppCompatActivity
                 menu.setHeaderTitle(hitTestResult.getExtra());
                 menu.add(0, ID_SAVE_IMAGE, 0, "Save image").setOnMenuItemClickListener(this);
                 menu.add(0, ID_OPEN_IMAGE, 1, "Open image").setOnMenuItemClickListener(this);
-                menu.add(0, ID_OPEN_IMAGE_IN_NEW_WINDOW, 2, "Open image in new window").setOnMenuItemClickListener(this);
+
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                    menu.add(0, ID_OPEN_IMAGE_IN_NEW_WINDOW, 2, "Open image in new window")
+                            .setOnMenuItemClickListener(this);
+                }
                 break;
             case WebView.HitTestResult.SRC_IMAGE_ANCHOR_TYPE:
                 menu.setHeaderTitle(hitTestResult.getExtra());
                 menu.add(0, ID_COPY_LINK, 0, "Copy link").setOnMenuItemClickListener(this);
                 menu.add(0, ID_SHARE_LINK, 1, "Share link").setOnMenuItemClickListener(this);
                 menu.add(0, ID_SAVE_LINK, 2, "Save link").setOnMenuItemClickListener(this);
-                menu.add(0, ID_OPEN_LINK_IN_NEW_WINDOW, 3, "Open link in new window")
-                        .setOnMenuItemClickListener(this);
-                menu.add(0, ID_OPEN_IMAGE, 4, "Open image").setOnMenuItemClickListener(this);
-                menu.add(0, ID_OPEN_IMAGE_IN_NEW_WINDOW, 5, "Open image in new window").setOnMenuItemClickListener(this);
-                menu.add(0, ID_SAVE_IMAGE, 6, "Save image").setOnMenuItemClickListener(this);
+
+                menu.add(1, ID_OPEN_IMAGE, 4, "Open image").setOnMenuItemClickListener(this);
+                menu.add(1, ID_SAVE_IMAGE, 6, "Save image").setOnMenuItemClickListener(this);
+
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                    menu.add(0, ID_OPEN_LINK_IN_NEW_WINDOW, 3, "Open link in new window")
+                            .setOnMenuItemClickListener(this);
+                    menu.add(1, ID_OPEN_IMAGE_IN_NEW_WINDOW, 5, "Open image in new window").setOnMenuItemClickListener(this);
+                }
                 break;
             case WebView.HitTestResult.SRC_ANCHOR_TYPE:
                 menu.setHeaderTitle(hitTestResult.getExtra());
                 menu.add(0, ID_COPY_LINK, 0, "Copy link").setOnMenuItemClickListener(this);
                 menu.add(0, ID_SHARE_LINK, 1, "Share link").setOnMenuItemClickListener(this);
                 menu.add(0, ID_SAVE_LINK, 2, "Save link").setOnMenuItemClickListener(this);
-                menu.add(0, ID_OPEN_LINK_IN_NEW_WINDOW, 3, "Open link in new window")
-                        .setOnMenuItemClickListener(this);
+
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                    menu.add(0, ID_OPEN_LINK_IN_NEW_WINDOW, 3, "Open link in new window")
+                            .setOnMenuItemClickListener(this);
+                }
                 break;
         }
     }
