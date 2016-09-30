@@ -534,9 +534,11 @@ public class MainActivity extends AppCompatActivity
             Toast.makeText(getApplicationContext(), "Downloading file...",
                     Toast.LENGTH_LONG).show();
         } catch (SecurityException e) {
-            Toast.makeText(getApplicationContext(), "Please enable STORAGE permission!",
-                    Toast.LENGTH_LONG).show();
-            openAppDetailsIntent(MainActivity.this, getPackageName());
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                Toast.makeText(getApplicationContext(), "Please enable STORAGE permission!",
+                        Toast.LENGTH_LONG).show();
+                openAppDetailsIntent(MainActivity.this, getPackageName());
+            }
         } catch (Exception e) {
             Toast.makeText(getApplicationContext(), "Failed to download file",
                     Toast.LENGTH_LONG).show();

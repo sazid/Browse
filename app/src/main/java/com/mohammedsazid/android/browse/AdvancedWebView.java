@@ -1213,9 +1213,11 @@ public class AdvancedWebView extends WebView {
 
             return true;
         } catch (SecurityException e) {
-            Toast.makeText(context, "Please enable STORAGE permission!",
-                    Toast.LENGTH_LONG).show();
-            openAppSettings(context, context.getPackageName());
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                Toast.makeText(context, "Please enable STORAGE permission!",
+                        Toast.LENGTH_LONG).show();
+                openAppSettings(context, context.getPackageName());
+            }
 
             return false;
         }
