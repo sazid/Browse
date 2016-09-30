@@ -605,7 +605,7 @@ public class MainActivity extends AppCompatActivity
     public void onDownloadRequested(String url, String suggestedFilename, String mimeType, long contentLength, String contentDisposition, String userAgent) {
 //        downloadFile(url, suggestedFilename);
         if (AdvancedWebView.handleDownload(this, url, suggestedFilename)) {
-            Toast.makeText(this, "Downloaded successfully!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Downloading file…", Toast.LENGTH_SHORT).show();
         } else {
             Toast.makeText(this, "Failed to download file", Toast.LENGTH_SHORT).show();
         }
