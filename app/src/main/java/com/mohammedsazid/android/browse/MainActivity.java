@@ -19,6 +19,7 @@ import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.PopupMenu;
 import android.text.TextUtils;
+import android.util.Log;
 import android.util.Patterns;
 import android.view.ContextMenu;
 import android.view.KeyEvent;
@@ -29,8 +30,7 @@ import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
-import android.webkit.DownloadListener;
-import android.webkit.URLUtil;
+import android.webkit.WebChromeClient;
 import android.webkit.WebResourceError;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebView;
@@ -52,16 +52,23 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 public class MainActivity extends AppCompatActivity
-        implements TextView.OnEditorActionListener, PopupMenu.OnMenuItemClickListener, MenuItem.OnMenuItemClickListener {
+        implements TextView.OnEditorActionListener, PopupMenu.OnMenuItemClickListener, MenuItem.OnMenuItemClickListener, AdvancedWebView.Listener {
 
     private static final long UI_HIDE_DELAY = TimeUnit.SECONDS.toMillis(3);
+    public static final int ID_SAVE_IMAGE = 1;
+    public static final int ID_OPEN_IMAGE = 2;
+    public static final int ID_OPEN_IMAGE_IN_NEW_WINDOW = 3;
+    public static final int ID_SAVE_LINK = 4;
+    public static final int ID_COPY_LINK = 5;
+    public static final int ID_SHARE_LINK = 6;
+    public static final int ID_OPEN_LINK_IN_NEW_WINDOW = 7;
 
     private List<String> autoCompleteList = new ArrayList<>();
     private Handler handler = new Handler();
     private Runnable uiHiderRunnable;
 
-    private VideoEnabledWebView webView;
-    private View nonVideoLayout;
+    private AdvancedWebView webView;
+    private ViewGroup nonVideoLayout;
     private ViewGroup videoLayout;
     private View loadingView;
     private AutoCompleteTextView addressBarEt;
@@ -71,7 +78,7 @@ public class MainActivity extends AppCompatActivity
     private ImageButton menuButton;
     private View bottomBar;
 
-    private VideoEnabledWebChromeClient webChromeClient;
+    private WebChromeClient webChromeClient;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -86,8 +93,8 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void bindViews() {
-        webView = (VideoEnabledWebView) findViewById(R.id.browse_webView);
-        nonVideoLayout = findViewById(R.id.nonVideoLayout);
+        webView = (AdvancedWebView) findViewById(R.id.browse_webView);
+        nonVideoLayout = (ViewGroup) findViewById(R.id.nonVideoLayout);
         videoLayout = (ViewGroup) findViewById(R.id.videoLayout);
         addressBarEt = (AutoCompleteTextView) findViewById(R.id.addressBar_et);
         titleTv = (TextView) findViewById(R.id.title_tv);
@@ -175,28 +182,30 @@ public class MainActivity extends AppCompatActivity
 
     private void setupWebView() {
 //        webView.getSettings().setJavaScriptEnabled(true);
+//        webView.getSettings().setAllowFileAccess(true);
+//        webView.getSettings().setAllowContentAccess(true);
+//        webView.getSettings().setDomStorageEnabled(true);
+//        webView.getSettings().setDatabaseEnabled(true);
         webView.getSettings().setSupportZoom(true);
         webView.getSettings().setBuiltInZoomControls(true);
         webView.getSettings().setDisplayZoomControls(false);
-        webView.getSettings().setAllowFileAccess(true);
-        webView.getSettings().setAllowContentAccess(true);
-        webView.getSettings().setDomStorageEnabled(true);
         webView.getSettings().setAppCacheEnabled(true);
         webView.getSettings().setAppCachePath(getCacheDir().getAbsolutePath()
                 + File.pathSeparator + "appCache" + File.pathSeparator);
-        webView.getSettings().setDatabaseEnabled(true);
         webView.setSaveEnabled(true);
+        webView.setListener(this, this);
+        webView.setCookiesEnabled(true);
+        webView.setThirdPartyCookiesEnabled(true);
+        webView.setMixedContentAllowed(true);
+        webView.setDesktopMode(false);
 
-        webChromeClient = new CustomWebChromeClient(this, nonVideoLayout, videoLayout, loadingView, webView);
-
-        webChromeClient.setOnToggledFullscreen(new FullscreenToggleCallback());
-
-        webView.setDownloadListener(new CustomDownloadListener());
+        webChromeClient = new CustomWebChromeClient();
 
         webView.setOnTouchListener(new WebViewTouchListener());
 
         webView.setWebChromeClient(webChromeClient);
         webView.setWebViewClient(new InsideWebViewClient(this));
+        webView.addHttpHeader("X-Requested-With", getString(R.string.app_name));
 
         registerForContextMenu(webView);
     }
@@ -230,14 +239,6 @@ public class MainActivity extends AppCompatActivity
         }
         getWindow().getDecorView().setSystemUiVisibility(flags);
     }
-
-    public static final int ID_SAVE_IMAGE = 1;
-    public static final int ID_OPEN_IMAGE = 2;
-    public static final int ID_OPEN_IMAGE_IN_NEW_WINDOW = 3;
-    public static final int ID_SAVE_LINK = 4;
-    public static final int ID_COPY_LINK = 5;
-    public static final int ID_SHARE_LINK = 6;
-    public static final int ID_OPEN_LINK_IN_NEW_WINDOW = 7;
 
     @Override
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
@@ -349,21 +350,33 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
+    protected void onDestroy() {
+        webView.onDestroy();
+        super.onDestroy();
+    }
+
+    @Override
     public void onBackPressed() {
-        if (!webChromeClient.onBackPressed()) {
-            if (webView.canGoBack()) {
-                webView.stopLoading();
-                webView.goBack();
-            } else {
-                super.onBackPressed();
-            }
+        if (!webView.onBackPressed()) {
+            return;
         }
+
+        super.onBackPressed();
+//        if (!webChromeClient.onBackPressed()) {
+//            if (webView.canGoBack()) {
+//                webView.stopLoading();
+//                webView.goBack();
+//            } else {
+//                super.onBackPressed();
+//            }
+//        }
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        webChromeClient.onActivityResult(requestCode, resultCode, data);
+        webView.onActivityResult(requestCode, resultCode, data);
+//        webChromeClient.onActivityResult(requestCode, resultCode, data);
     }
 
     @Override
@@ -508,7 +521,6 @@ public class MainActivity extends AppCompatActivity
 
     private void downloadFile(String url, String fileName) {
 //        String fileName = Uri.parse(url).getLastPathSegment();
-
         try {
             DownloadManager.Request request = new DownloadManager.Request(
                     Uri.parse(url));
@@ -528,6 +540,7 @@ public class MainActivity extends AppCompatActivity
         } catch (Exception e) {
             Toast.makeText(getApplicationContext(), "Failed to download file",
                     Toast.LENGTH_LONG).show();
+            Log.e("Browse Download", e.getMessage());
         }
     }
 
@@ -569,6 +582,43 @@ public class MainActivity extends AppCompatActivity
         startActivity(Intent.createChooser(i, "Share URL"));
     }
 
+    @Override
+    public void onPageStarted(String url, Bitmap favicon) {
+        webView.requestFocus();
+    }
+
+    @Override
+    public void onPageFinished(String url) {
+        showUi();
+    }
+
+    @Override
+    public void onPageError(int errorCode, String description, String failingUrl) {
+        Toast.makeText(
+                this,
+                "Failed to load URL: " + failingUrl + "\n" + description,
+                Toast.LENGTH_SHORT
+        ).show();
+    }
+
+    @Override
+    public void onDownloadRequested(String url, String suggestedFilename, String mimeType, long contentLength, String contentDisposition, String userAgent) {
+//        downloadFile(url, suggestedFilename);
+        if (AdvancedWebView.handleDownload(this, url, suggestedFilename)) {
+            Toast.makeText(this, "Downloaded successfully!", Toast.LENGTH_SHORT).show();
+        } else {
+            Toast.makeText(this, "Failed to download file", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    @Override
+    public void onExternalPageRequest(String url) {
+        Toast.makeText(
+                this,
+                "onExternalPageRequest(url = " + url + ")",
+                Toast.LENGTH_SHORT).show();
+    }
+
     @SuppressWarnings("deprecation")
     private class InsideWebViewClient extends WebViewClient {
 
@@ -595,16 +645,6 @@ public class MainActivity extends AppCompatActivity
             return super.shouldOverrideUrlLoading(view, url);
         }
 
-        @Override
-        public void onReceivedError(WebView view, int errorCode, String description, String failingUrl) {
-            super.onReceivedError(view, errorCode, description, failingUrl);
-            Toast.makeText(
-                    activity,
-                    "Error occurred: " + description,
-                    Toast.LENGTH_SHORT
-            ).show();
-        }
-
         @TargetApi(Build.VERSION_CODES.M)
         @Override
         public void onReceivedError(WebView view, WebResourceRequest request, WebResourceError error) {
@@ -615,44 +655,9 @@ public class MainActivity extends AppCompatActivity
             ).show();
             super.onReceivedError(view, request, error);
         }
-
-        @Override
-        public void onPageStarted(WebView view, String url, Bitmap favicon) {
-            super.onPageStarted(view, url, favicon);
-            webView.requestFocus();
-        }
     }
 
-    class FullscreenToggleCallback implements VideoEnabledWebChromeClient.ToggledFullscreenCallback {
-        @Override
-        public void toggledFullscreen(boolean fullscreen) {
-            if (fullscreen) {
-                WindowManager.LayoutParams attrs = getWindow().getAttributes();
-                attrs.flags |= WindowManager.LayoutParams.FLAG_FULLSCREEN;
-                attrs.flags |= WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON;
-                getWindow().setAttributes(attrs);
-                hideSystemUI();
-//                    getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LOW_PROFILE);
-            } else {
-                WindowManager.LayoutParams attrs = getWindow().getAttributes();
-                attrs.flags &= ~WindowManager.LayoutParams.FLAG_FULLSCREEN;
-                attrs.flags &= ~WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON;
-                getWindow().setAttributes(attrs);
-                showSystemUI();
-//                    getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_VISIBLE);
-            }
-        }
-    }
-
-    class CustomWebChromeClient extends VideoEnabledWebChromeClient {
-        @SuppressWarnings("unused")
-        public CustomWebChromeClient(
-                Activity activity,
-                View activityNonVideoView,
-                ViewGroup activityVideoView,
-                View loadingView, VideoEnabledWebView webView) {
-            super(activity, activityNonVideoView, activityVideoView, loadingView, webView);
-        }
+    class CustomWebChromeClient extends WebChromeClient {
 
         @Override
         public void onProgressChanged(WebView view, int newProgress) {
@@ -685,19 +690,40 @@ public class MainActivity extends AppCompatActivity
             }
             setTaskTitleAndIcon(titleTv.getText().toString(), icon);
         }
+
+        @Override
+        public void onShowCustomView(View view, CustomViewCallback callback) {
+            super.onShowCustomView(view, callback);
+            showVideoInFullscreen(view);
+        }
+
+        @Override
+        public void onHideCustomView() {
+            super.onHideCustomView();
+            revertFullscreenVideo();
+        }
     }
 
-    class CustomDownloadListener implements DownloadListener {
-        public void onDownloadStart(String url, String userAgent,
-                                    String contentDisposition, String mimeType,
-                                    long contentLength) {
-//                Intent i = new Intent(Intent.ACTION_VIEW);
-//                i.setData(Uri.parse(url));
-//                startActivity(i);
+    private void showVideoInFullscreen(View view) {
+        nonVideoLayout.setVisibility(View.INVISIBLE);
+        videoLayout.setVisibility(View.VISIBLE);
+        videoLayout.addView(view);
+        WindowManager.LayoutParams attrs = getWindow().getAttributes();
+        attrs.flags |= WindowManager.LayoutParams.FLAG_FULLSCREEN;
+        attrs.flags |= WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON;
+        getWindow().setAttributes(attrs);
+        hideSystemUI();
+    }
 
-            String fileName = URLUtil.guessFileName(url, contentDisposition, mimeType);
-            downloadFile(url, fileName);
-        }
+    private void revertFullscreenVideo() {
+        videoLayout.removeAllViews();
+        videoLayout.setVisibility(View.GONE);
+        nonVideoLayout.setVisibility(View.VISIBLE);
+        WindowManager.LayoutParams attrs = getWindow().getAttributes();
+        attrs.flags &= ~WindowManager.LayoutParams.FLAG_FULLSCREEN;
+        attrs.flags &= ~WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON;
+        getWindow().setAttributes(attrs);
+        showSystemUI();
     }
 
     class WebViewTouchListener implements View.OnTouchListener {

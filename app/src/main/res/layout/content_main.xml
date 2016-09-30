@@ -8,7 +8,7 @@
     tools:ignore="ContentDescription"
     tools:showIn="@layout/activity_main">
 
-    <com.mohammedsazid.android.browse.VideoEnabledWebView
+    <com.mohammedsazid.android.browse.AdvancedWebView
         android:id="@+id/browse_webView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
