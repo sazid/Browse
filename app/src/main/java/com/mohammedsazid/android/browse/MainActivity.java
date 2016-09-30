@@ -186,13 +186,6 @@ public class MainActivity extends AppCompatActivity
 //        webView.getSettings().setAllowContentAccess(true);
 //        webView.getSettings().setDomStorageEnabled(true);
 //        webView.getSettings().setDatabaseEnabled(true);
-        webView.getSettings().setSupportZoom(true);
-        webView.getSettings().setBuiltInZoomControls(true);
-        webView.getSettings().setDisplayZoomControls(false);
-        webView.getSettings().setAppCacheEnabled(true);
-        webView.getSettings().setAppCachePath(getCacheDir().getAbsolutePath()
-                + File.pathSeparator + "appCache" + File.pathSeparator);
-        webView.setSaveEnabled(true);
         webView.setListener(this, this);
         webView.setCookiesEnabled(true);
         webView.setThirdPartyCookiesEnabled(true);
@@ -206,6 +199,14 @@ public class MainActivity extends AppCompatActivity
         webView.setWebChromeClient(webChromeClient);
         webView.setWebViewClient(new InsideWebViewClient(this));
         webView.addHttpHeader("X-Requested-With", getString(R.string.app_name));
+
+        webView.getSettings().setSupportZoom(true);
+        webView.getSettings().setBuiltInZoomControls(true);
+        webView.getSettings().setDisplayZoomControls(false);
+        webView.getSettings().setAppCacheEnabled(true);
+        webView.getSettings().setAppCachePath(getCacheDir().getAbsolutePath()
+                + File.pathSeparator + "appCache" + File.pathSeparator);
+        webView.setSaveEnabled(true);
 
         registerForContextMenu(webView);
     }
