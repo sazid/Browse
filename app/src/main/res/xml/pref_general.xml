@@ -33,8 +33,8 @@
     <SwitchPreference
         android:defaultValue="true"
         android:key="pref_image_loading_key"
-        android:title="@string/pref_title_image_loading"
-        android:summary="@string/pref_description_image_loading" />
+        android:summary="@string/pref_description_image_loading"
+        android:title="@string/pref_title_image_loading" />
 
     <SwitchPreference
         android:defaultValue="true"
@@ -43,6 +43,7 @@
 
     <SwitchPreference
         android:defaultValue="true"
+        android:dependency="pref_cookies_key"
         android:key="pref_thid_party_cookies_key"
         android:title="@string/pref_title_third_party_cookies" />
 
