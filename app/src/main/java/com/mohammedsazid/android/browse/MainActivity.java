@@ -70,7 +70,7 @@ public class MainActivity extends AppCompatActivity
     private AdvancedWebView webView;
     private ViewGroup nonVideoLayout;
     private ViewGroup videoLayout;
-    private View loadingView;
+    //    private View loadingView;
     private AutoCompleteTextView addressBarEt;
     private TextView titleTv;
     private ImageView iconIv;
@@ -103,7 +103,7 @@ public class MainActivity extends AppCompatActivity
         menuButton = (ImageButton) findViewById(R.id.menu_button);
         bottomBar = findViewById(R.id.bottom_bar);
 
-        loadingView = getLayoutInflater().inflate(R.layout.view_loading_video, null);
+//        loadingView = getLayoutInflater().inflate(R.layout.view_loading_video, null);
     }
 
     private void prepareUiHiderRunnable() {
