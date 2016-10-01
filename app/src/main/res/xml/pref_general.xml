@@ -22,7 +22,7 @@
          dismiss it. -->
     <!-- NOTE: ListPreference's summary should be set to its value by the activity code. -->
     <ListPreference
-        android:defaultValue="-1"
+        android:defaultValue="0"
         android:entries="@array/pref_search_engine_list_titles"
         android:entryValues="@array/pref_search_engine_list_values"
         android:key="search_engine_list_key"
@@ -44,7 +44,13 @@
     <SwitchPreference
         android:defaultValue="true"
         android:dependency="pref_cookies_key"
-        android:key="pref_thid_party_cookies_key"
+        android:key="pref_third_party_cookies_key"
         android:title="@string/pref_title_third_party_cookies" />
+
+    <SwitchPreference
+        android:defaultValue="true"
+        android:key="pref_mixed_content_key"
+        android:summary="@string/pref_description_mixed_content"
+        android:title="@string/pref_title_mixed_content" />
 
 </PreferenceScreen>

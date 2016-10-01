@@ -26,11 +26,14 @@
     <string name="pref_description_desktop_mode">Use desktop versions of sites you visit</string>
 
     <string name="pref_title_image_loading">Load images</string>
-    <string name="pref_description_image_loading">Load images when you visit websites. Disable to save data and load pages faster.</string>
+    <string name="pref_description_image_loading">Automatically load images when you visit websites.</string>
 
     <string name="pref_title_cookies">Cookies</string>
 
     <string name="pref_title_third_party_cookies">3rd party cookies</string>
+
+    <string name="pref_title_mixed_content">Allow mixed content</string>
+    <string name="pref_description_mixed_content">HTTP content being loaded inside HTTPS sites</string>
 
     <string name="pref_title_home_page">Home page</string>
     <string name="pref_default_home_page">https://google.com</string>

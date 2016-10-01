@@ -8,13 +8,14 @@ import android.app.DownloadManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
-import android.support.annotation.NonNull;
+import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.PopupMenu;
@@ -43,9 +44,6 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.afollestad.materialdialogs.DialogAction;
-import com.afollestad.materialdialogs.MaterialDialog;
-
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
@@ -66,6 +64,7 @@ public class MainActivity extends AppCompatActivity
     private List<String> autoCompleteList = new ArrayList<>();
     private Handler handler = new Handler();
     private Runnable uiHiderRunnable;
+    private SharedPreferences pref;
 
     private AdvancedWebView webView;
     private ViewGroup nonVideoLayout;
@@ -84,6 +83,7 @@ public class MainActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        pref = PreferenceManager.getDefaultSharedPreferences(this);
         bindViews();
         setupWebView();
         setupAutoCompleteList();
@@ -144,10 +144,9 @@ public class MainActivity extends AppCompatActivity
                 && intent.getData() != null
                 && intent.getAction().equals(Intent.ACTION_VIEW)) {
             loadWebPage(getIntent().getDataString());
-        }/* else if (TextUtils.isEmpty(webView.getUrl())) {
-            // TODO: Use SharedPreferences for storing user's home page
-            webView.loadUrl("http://saved.io/");
-        }*/
+        } else if (TextUtils.isEmpty(webView.getUrl())) {
+            webView.loadUrl(pref.getString("pref_home_page_key", "https://google.com/"));
+        }
     }
 
     private void setupAutoCompleteList() {
@@ -187,10 +186,8 @@ public class MainActivity extends AppCompatActivity
 //        webView.getSettings().setDomStorageEnabled(true);
 //        webView.getSettings().setDatabaseEnabled(true);
         webView.setListener(this, this);
-        webView.setCookiesEnabled(true);
-        webView.setThirdPartyCookiesEnabled(true);
-        webView.setMixedContentAllowed(true);
-        webView.setDesktopMode(false);
+
+        loadWebViewSettingsOnResume();
 
         webChromeClient = new CustomWebChromeClient();
 
@@ -350,6 +347,21 @@ public class MainActivity extends AppCompatActivity
         webView.loadUrl(searchQuery.toString());
     }
 
+    private void loadWebViewSettingsOnResume() {
+        webView.setCookiesEnabled(pref.getBoolean("pref_cookies_key", true));
+        if (pref.getBoolean("pref_cookies_key", true)) {
+            webView.setThirdPartyCookiesEnabled(
+                    pref.getBoolean("pref_third_party_cookies_key", true));
+        }
+        webView.setMixedContentAllowed(pref.getBoolean("pref_mixed_content_key", true));
+        webView.setDesktopMode(pref.getBoolean("pref_desktop_mode_key", false));
+        webView.getSettings().setLoadsImagesAutomatically(
+                pref.getBoolean("pref_image_loading_key", true));
+        webView.getSettings().setBlockNetworkImage(
+                pref.getBoolean("pref_image_loading_key", true));
+        addressBarEt.setText(webView.getUrl());
+    }
+
     @Override
     protected void onDestroy() {
         webView.onDestroy();
@@ -384,6 +396,7 @@ public class MainActivity extends AppCompatActivity
     protected void onResume() {
         super.onResume();
         webView.onResume();
+        loadWebViewSettingsOnResume();
     }
 
     @Override
@@ -447,10 +460,6 @@ public class MainActivity extends AppCompatActivity
                     intent.addFlags(Intent.FLAG_ACTIVITY_NEW_DOCUMENT);
                     startActivity(intent);
                 }
-                return true;
-
-            case R.id.action_about:
-                showAboutDialog();
                 return true;
 
             case R.id.action_share:
@@ -549,35 +558,16 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    private void composeEmail(String[] addresses, String subject, String body) {
-        Intent intent = new Intent(Intent.ACTION_SENDTO);
-        intent.setData(Uri.parse("mailto:"));
-        intent.putExtra(Intent.EXTRA_EMAIL, addresses);
-        intent.putExtra(Intent.EXTRA_SUBJECT, subject);
-        intent.putExtra(Intent.EXTRA_TEXT, body);
-        if (intent.resolveActivity(getPackageManager()) != null) {
-            startActivity(intent);
-        }
-    }
-
-    private void showAboutDialog() {
-        new MaterialDialog.Builder(this)
-                .title(R.string.app_name)
-                .content(R.string.about_summary)
-                .positiveText("OK")
-                .neutralText("EMAIL")
-                .onNeutral(new MaterialDialog.SingleButtonCallback() {
-                    @Override
-                    public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                        composeEmail(
-                                new String[]{"sazidozon@gmail.com"},
-                                "[Browse]: Feedback & Suggestions",
-                                ""
-                        );
-                    }
-                })
-                .show();
-    }
+//    private void composeEmail(String[] addresses, String subject, String body) {
+//        Intent intent = new Intent(Intent.ACTION_SENDTO);
+//        intent.setData(Uri.parse("mailto:"));
+//        intent.putExtra(Intent.EXTRA_EMAIL, addresses);
+//        intent.putExtra(Intent.EXTRA_SUBJECT, subject);
+//        intent.putExtra(Intent.EXTRA_TEXT, body);
+//        if (intent.resolveActivity(getPackageManager()) != null) {
+//            startActivity(intent);
+//        }
+//    }
 
     private void shareUrl(String url) {
         Intent i = new Intent(Intent.ACTION_SEND);
