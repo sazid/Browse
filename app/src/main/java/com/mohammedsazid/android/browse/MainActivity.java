@@ -340,11 +340,42 @@ public class MainActivity extends AppCompatActivity
             return;
         }
 
-        Uri searchQuery = Uri.parse("https://www.google.com/search")
+        String[] searchDomainAndQueryParam = getSearchDomainAndQueryParam();
+
+        Uri searchQuery = Uri.parse(searchDomainAndQueryParam[0])
                 .buildUpon()
-                .appendQueryParameter("q", queryOrUrl)
+                .appendQueryParameter(searchDomainAndQueryParam[1], queryOrUrl)
                 .build();
         webView.loadUrl(searchQuery.toString());
+    }
+
+    private String[] getSearchDomainAndQueryParam() {
+        String[] s = new String[2];
+
+        switch (pref.getString("search_engine_list_key", "0")) {
+            case "0":
+                s[0] = "https://www.google.com/search";
+                s[1] = "q";
+                break;
+            case "1":
+                s[0] = "https://www.bing.com/search";
+                s[1] = "q";
+                break;
+            case "2":
+                s[0] = "https://search.yahoo.com/search";
+                s[1] = "p";
+                break;
+            case "3":
+                s[0] = "https://duckduckgo.com/";
+                s[1] = "q";
+                break;
+            case "4":
+                s[0] = "https://www.youtube.com/results";
+                s[1] = "search_query";
+                break;
+        }
+
+        return s;
     }
 
     private void loadWebViewSettingsOnResume() {
@@ -357,8 +388,8 @@ public class MainActivity extends AppCompatActivity
         webView.setDesktopMode(pref.getBoolean("pref_desktop_mode_key", false));
         webView.getSettings().setLoadsImagesAutomatically(
                 pref.getBoolean("pref_image_loading_key", true));
-        webView.getSettings().setBlockNetworkImage(
-                pref.getBoolean("pref_image_loading_key", true));
+//        webView.getSettings().setBlockNetworkImage(
+//                pref.getBoolean("pref_image_loading_key", true));
         addressBarEt.setText(webView.getUrl());
     }
 
