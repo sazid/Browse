@@ -436,6 +436,8 @@ public class MainActivity extends AppCompatActivity
                 return true;
 
             case R.id.action_settings:
+                Intent settingsIntent = new Intent(this, BrowseSettings.class);
+                startActivity(settingsIntent);
                 return true;
 
             case R.id.action_new_tab:

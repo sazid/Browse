@@ -1,0 +1,28 @@
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <Preference
+        android:summary="@string/about_summary"
+        android:title="@string/pref_title_about" />
+
+    <!-- This preference simply launches an intent when selected. Use this UI sparingly, per
+         design guidelines. -->
+    <Preference android:title="@string/pref_title_email">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:data="@string/email_uri">
+            <extra
+                android:name="android.intent.extra.SUBJECT"
+                android:value="@string/email_sub" />
+        </intent>
+    </Preference>
+
+    <Preference android:title="@string/pref_project_page">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:data="@string/project_page_uri"
+            android:targetClass="com.mohammedsazid.android.browse.MainActivity"
+            android:targetPackage="com.mohammedsazid.android.browse" />
+    </Preference>
+
+
+</PreferenceScreen>
