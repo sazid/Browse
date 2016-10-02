@@ -1,36 +1,59 @@
+#language: android
+#jdk: oraclejdk8
+#sudo: required
+#
+#android:
+#  components:
+#    # Uncomment the lines below if you want to
+#    # use the latest revision of Android SDK Tools
+#    - platform-tools
+#    - tools
+#
+#    # The BuildTools version used by your project
+#    - build-tools-24.0.2
+#
+#    # The SDK version used to compile your project
+#    - android-24
+#    # - android-21
+#
+#    # Additional components
+#    # - extra-google-google_play_services
+#    # - extra-google-m2repository
+#    - extra-android-m2repository
+#    - extra-android-support
+#    # - extra-android-design
+#    # - addon-google_apis-google-19
+#
+#    # Specify at least one system image,
+#    # if you need to run emulator(s) during your tests
+#    # - sys-img-armeabi-v7a-android-24
+#    # - sys-img-x86-android-17
+#
+#script:
+#  - ./gradlew clean build -i --continue
+
 language: android
 jdk: oraclejdk8
-sudo: required
+sudo: false
 
 android:
   components:
-    # Uncomment the lines below if you want to
-    # use the latest revision of Android SDK Tools
     - platform-tools
     - tools
-
-    # The BuildTools version used by your project
     - build-tools-24.0.2
-
-    # The SDK version used to compile your project
+    - android-22
     - android-24
-    # - android-21
-
-    # Additional components
-    # - extra-google-google_play_services
-    # - extra-google-m2repository
+    - sys-img-armeabi-v7a-android-22
     - extra-android-m2repository
-    - extra-android-support
-    # - extra-android-design
-    # - addon-google_apis-google-19
 
-    # Specify at least one system image,
-    # if you need to run emulator(s) during your tests
-    # - sys-img-armeabi-v7a-android-24
-    # - sys-img-x86-android-17
+before_script:
+  # Create and start emulator
+  - echo no | android create avd --force -n test -t android-22 --abi armeabi-v7a
+  - emulator -avd test -no-skin -no-audio -no-window &
+  - android-wait-for-emulator
+  - adb shell input keyevent 82 &
 
-script:
-  - ./gradlew clean build -i --continue
+script: ./gradlew connectedAndroidTest
 
 before_install:
   # Make the gradlew wrapper executable before installing anything
