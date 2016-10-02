@@ -10,6 +10,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -20,7 +21,7 @@ import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.PopupMenu;
 import android.text.TextUtils;
-import android.util.Log;
+import android.util.Base64;
 import android.util.Patterns;
 import android.view.ContextMenu;
 import android.view.KeyEvent;
@@ -44,7 +45,12 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -199,7 +205,7 @@ public class MainActivity extends AppCompatActivity
 
         webView.getSettings().setAppCacheEnabled(true);
         webView.getSettings().setAppCachePath(getCacheDir().getAbsolutePath()
-                + File.pathSeparator + "appCache" + File.pathSeparator);
+                + File.separator + "appCache" + File.separator);
         webView.setSaveEnabled(true);
 
         registerForContextMenu(webView);
@@ -575,19 +581,88 @@ public class MainActivity extends AppCompatActivity
             DownloadManager dm = (DownloadManager) getSystemService(DOWNLOAD_SERVICE);
 
             dm.enqueue(request);
-            Toast.makeText(getApplicationContext(), "Downloading file...",
+            Toast.makeText(this, "Downloading file...",
                     Toast.LENGTH_LONG).show();
+        } catch (IllegalArgumentException e) {
+//            url = url.replace("data:image/jpeg;base64,","");
+            url = url.substring(url.indexOf(","));
+
+            byte[] imageAsBytes = Base64.decode(url.getBytes(), 0);
+            if (imageAsBytes == null) {
+                return;
+            }
+
+            Bitmap image = BitmapFactory.decodeByteArray(imageAsBytes, 0, imageAsBytes.length);
+            String filePath = getImageFileName();
+
+            FileOutputStream out = null;
+            try {
+                out = new FileOutputStream(filePath);
+                image.compress(Bitmap.CompressFormat.PNG, 100, out);
+
+                Toast.makeText(this, "Image saved at:\n" + filePath,
+                        Toast.LENGTH_LONG).show();
+            } catch (Exception e1) {
+                e1.printStackTrace();
+            } finally {
+                if (out != null) {
+                    try {
+                        out.close();
+                    } catch (IOException e1) {
+                        e1.printStackTrace();
+                    }
+                }
+            }
         } catch (SecurityException e) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                Toast.makeText(getApplicationContext(), "Please enable STORAGE permission!",
+                Toast.makeText(this, "Please enable STORAGE permission!",
                         Toast.LENGTH_LONG).show();
                 openAppDetailsIntent(MainActivity.this, getPackageName());
             }
+            e.printStackTrace();
         } catch (Exception e) {
-            Toast.makeText(getApplicationContext(), "Failed to download file",
+            Toast.makeText(this, "Failed to download file",
                     Toast.LENGTH_LONG).show();
-            Log.e("Browse Download", e.getMessage());
+            e.printStackTrace();
         }
+    }
+
+    private String getImageFileName() {
+        String filePath = Environment
+                .getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES)
+                + File.separator
+                + "Image #0.png";
+        File file = new File(filePath);
+
+        int counter = 0;
+        while (file.exists()) {
+            filePath = Environment
+                    .getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES)
+                    + File.separator
+                    + "Image #" + counter + ".png";
+            file = new File(filePath);
+            counter++;
+        }
+
+        return filePath;
+    }
+
+    private byte[] readImageFromBytes(String imageData) {
+        try {
+            InputStream is = new ByteArrayInputStream(imageData.getBytes());
+            byte[] buffer = new byte[imageData.getBytes().length];
+            int bytesRead;
+            ByteArrayOutputStream output = new ByteArrayOutputStream();
+            while ((bytesRead = is.read(buffer)) != -1) {
+                output.write(buffer, 0, bytesRead);
+            }
+
+            return output.toByteArray();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return null;
     }
 
 //    private void composeEmail(String[] addresses, String subject, String body) {
