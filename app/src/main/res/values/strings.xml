@@ -7,6 +7,7 @@
     <string name="action_new_tab">New tab</string>
     <string name="action_about">About</string>
     <string name="action_share">Share</string>
+    <string name="action_add_to_home_screen">Add to Home screen</string>
 	<string name="about_summary">A fast, simple and open source light-weight web browser for Android.
         \n
         \nMohammed Sazid Al Rashid

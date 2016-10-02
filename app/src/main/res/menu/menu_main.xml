@@ -8,6 +8,10 @@
         android:title="@string/action_share" />
 
     <item
+        android:id="@+id/action_add_to_home_screen"
+        android:title="@string/action_add_to_home_screen" />
+
+    <item
         android:id="@+id/action_forward"
         android:title="@string/action_forward" />
 

@@ -17,9 +17,11 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.preference.PreferenceManager;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.PopupMenu;
+import android.text.InputType;
 import android.text.TextUtils;
 import android.util.Base64;
 import android.util.Patterns;
@@ -44,6 +46,8 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.afollestad.materialdialogs.MaterialDialog;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -500,6 +504,10 @@ public class MainActivity extends AppCompatActivity
                 }
                 return true;
 
+            case R.id.action_add_to_home_screen:
+                addCurrentSiteToHomeScreen();
+                return true;
+
             case R.id.action_share:
                 shareUrl(webView.getUrl());
                 return true;
@@ -543,6 +551,27 @@ public class MainActivity extends AppCompatActivity
         }
 
         return false;
+    }
+
+    private void addCurrentSiteToHomeScreen() {
+        final Intent shortcutIntent = new Intent(this, MainActivity.class);
+        shortcutIntent.setAction(Intent.ACTION_VIEW);
+
+        new MaterialDialog.Builder(this)
+                .title("Add to Home screen")
+                .inputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_CAP_SENTENCES)
+                .input("Shortcut name", webView.getTitle(), false, new MaterialDialog.InputCallback() {
+                    @Override
+                    public void onInput(@NonNull MaterialDialog dialog, CharSequence input) {
+                        final Intent intent = new Intent();
+                        intent.putExtra(Intent.EXTRA_SHORTCUT_INTENT, shortcutIntent);
+                        intent.putExtra(Intent.EXTRA_SHORTCUT_NAME, input.toString());
+                        intent.putExtra(Intent.EXTRA_SHORTCUT_ICON, webView.getFavicon());
+                        intent.setAction("com.android.launcher.action.INSTALL_SHORTCUT");
+                        sendBroadcast(intent);
+                    }
+                })
+                .show();
     }
 
     @SuppressLint("NewApi")
