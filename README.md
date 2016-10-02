@@ -1,5 +1,5 @@
 # Browse
-<!-- [![Build Status](https://travis-ci.org/sazid/Browse.svg?branch=master)](https://travis-ci.org/sazid/Browse) -->
+[![Build Status](https://travis-ci.org/sazid/Browse.svg?branch=master)](https://travis-ci.org/sazid/Browse)
 
 A fast, simple and open source light-weight web browser for Android
 

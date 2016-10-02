@@ -554,8 +554,9 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void addCurrentSiteToHomeScreen() {
-        final Intent shortcutIntent = new Intent(this, MainActivity.class);
-        shortcutIntent.setAction(Intent.ACTION_VIEW);
+        final Intent shortcutIntent = new Intent(Intent.ACTION_VIEW);
+        shortcutIntent.setComponent(new ComponentName(this, MainActivity.class));
+        shortcutIntent.setData(Uri.parse(webView.getUrl()));
 
         new MaterialDialog.Builder(this)
                 .title("Add to Home screen")
