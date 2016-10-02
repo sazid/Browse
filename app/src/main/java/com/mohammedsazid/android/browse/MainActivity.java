@@ -569,6 +569,10 @@ public class MainActivity extends AppCompatActivity
                         intent.putExtra(Intent.EXTRA_SHORTCUT_ICON, webView.getFavicon());
                         intent.setAction("com.android.launcher.action.INSTALL_SHORTCUT");
                         sendBroadcast(intent);
+
+                        Toast.makeText(MainActivity.this,
+                                "Shortcut added to Home screen",
+                                Toast.LENGTH_SHORT).show();
                     }
                 })
                 .show();
