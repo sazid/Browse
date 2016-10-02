@@ -1,6 +1,6 @@
 language: android
 jdk: oraclejdk8
-sudo: false
+#sudo: false
 
 android:
   components:
@@ -14,7 +14,7 @@ android:
 
     # The SDK version used to compile your project
     - android-24
-    - android-21
+    # - android-21
 
     # Additional components
     # - extra-google-google_play_services
