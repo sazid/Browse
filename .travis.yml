@@ -1,6 +1,6 @@
 language: android
 jdk: oraclejdk8
-#sudo: false
+sudo: required
 
 android:
   components:
@@ -20,6 +20,8 @@ android:
     # - extra-google-google_play_services
     # - extra-google-m2repository
     - extra-android-m2repository
+    - extra-android-support
+    # - extra-android-design
     # - addon-google_apis-google-19
 
     # Specify at least one system image,
@@ -27,6 +29,9 @@ android:
     # - sys-img-armeabi-v7a-android-24
     # - sys-img-x86-android-17
 
+script:
+  - ./gradlew clean build -i --continue
+
 before_install:
-    # Make the gradlew wrapper executable before installing anything
-    - chmod +x gradlew
+  # Make the gradlew wrapper executable before installing anything
+  - chmod +x gradlew
