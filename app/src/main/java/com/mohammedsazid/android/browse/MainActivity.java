@@ -759,6 +759,11 @@ public class MainActivity extends AppCompatActivity
 
         @Override
         public boolean onTouch(View view, MotionEvent event) {
+            if (addressBarEt.hasFocus()) {
+                addressBarEt.clearFocus();
+                hideKeyboard();
+            }
+
             switch (event.getAction()) {
                 case MotionEvent.ACTION_DOWN:
                     startX = event.getX();
