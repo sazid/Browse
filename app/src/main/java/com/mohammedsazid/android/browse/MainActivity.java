@@ -197,9 +197,6 @@ public class MainActivity extends AppCompatActivity
         webView.setWebViewClient(new InsideWebViewClient(this));
         webView.addHttpHeader("X-Requested-With", getString(R.string.app_name));
 
-        webView.getSettings().setSupportZoom(true);
-        webView.getSettings().setBuiltInZoomControls(true);
-        webView.getSettings().setDisplayZoomControls(false);
         webView.getSettings().setAppCacheEnabled(true);
         webView.getSettings().setAppCachePath(getCacheDir().getAbsolutePath()
                 + File.pathSeparator + "appCache" + File.pathSeparator);
@@ -390,6 +387,10 @@ public class MainActivity extends AppCompatActivity
                 pref.getBoolean("pref_image_loading_key", true));
 //        webView.getSettings().setBlockNetworkImage(
 //                pref.getBoolean("pref_image_loading_key", true));
+        webView.getSettings().setSupportZoom(true);
+        webView.getSettings().setBuiltInZoomControls(true);
+        webView.getSettings().setDisplayZoomControls(false);
+
         addressBarEt.setText(webView.getUrl());
     }
 
