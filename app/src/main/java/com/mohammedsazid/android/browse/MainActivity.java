@@ -76,6 +76,7 @@ public class MainActivity extends AppCompatActivity
     private Runnable uiHiderRunnable;
     private SharedPreferences pref;
 
+    private PopupMenu popup;
     private AdvancedWebView webView;
     private ViewGroup nonVideoLayout;
     private ViewGroup videoLayout;
@@ -98,6 +99,7 @@ public class MainActivity extends AppCompatActivity
         setupWebView();
         setupAutoCompleteList();
         setupAddressBar();
+        prepareMainMenu(menuButton);
         prepareUiHiderRunnable();
         checkAndLaunchUrlFromIntent(getIntent());
     }
@@ -449,11 +451,12 @@ public class MainActivity extends AppCompatActivity
 
     public void onMenuButtonClick(View v) {
 //        webView.stopLoading();
-        showMainMenu(menuButton);
+        showMainMenu();
     }
 
-    private void showMainMenu(View v) {
-        PopupMenu popup = new PopupMenu(this, v);
+    private void prepareMainMenu(View v) {
+        popup = new PopupMenu(this, v);
+        v.setOnTouchListener(popup.getDragToOpenListener());
         popup.getMenuInflater()
                 .inflate(R.menu.menu_main, popup.getMenu());
         popup.setOnMenuItemClickListener(this);
@@ -466,7 +469,9 @@ public class MainActivity extends AppCompatActivity
 //            mPopup.setForceShowIcon(true);
 //        } catch (Exception e) {
 //        }
+    }
 
+    private void showMainMenu() {
         popup.show();
     }
 
