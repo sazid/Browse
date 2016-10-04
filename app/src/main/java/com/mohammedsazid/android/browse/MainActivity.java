@@ -774,6 +774,13 @@ public class MainActivity extends AppCompatActivity
         // Force links to be opened inside WebView and not in Default Browser
         // Thanks http://stackoverflow.com/a/33681975/1815624
         public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
+            Uri uri = request.getUrl();
+            if (uri.getScheme().equals("market")) {
+                Intent marketIntent = new Intent(Intent.ACTION_VIEW, uri);
+                startActivity(marketIntent);
+                return true;
+            }
+
             view.loadUrl(request.getUrl().toString());
             return super.shouldOverrideUrlLoading(view, request);
         }
@@ -782,6 +789,13 @@ public class MainActivity extends AppCompatActivity
         // Force links to be opened inside WebView and not in Default Browser
         // Thanks http://stackoverflow.com/a/33681975/1815624
         public boolean shouldOverrideUrlLoading(WebView view, String url) {
+            Uri uri = Uri.parse(url);
+            if (uri.getScheme().equals("market")) {
+                Intent marketIntent = new Intent(Intent.ACTION_VIEW, uri);
+                startActivity(marketIntent);
+                return true;
+            }
+
             view.loadUrl(url);
             return super.shouldOverrideUrlLoading(view, url);
         }
