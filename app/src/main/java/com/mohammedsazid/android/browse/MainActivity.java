@@ -166,7 +166,7 @@ public class MainActivity extends AppCompatActivity
                     .start();
         }
 
-        hideUi();
+//        hideUi();
     }
 
     private void checkAndLaunchUrlFromIntent(Intent intent) {
@@ -342,7 +342,9 @@ public class MainActivity extends AppCompatActivity
     private void hideKeyboard() {
         InputMethodManager imm = (InputMethodManager)
                 getSystemService(Context.INPUT_METHOD_SERVICE);
-        imm.hideSoftInputFromWindow(getWindow().getDecorView().getWindowToken(), 0);
+        if (imm != null) {
+            imm.hideSoftInputFromWindow(getWindow().getDecorView().getWindowToken(), 0);
+        }
     }
 
     private void loadWebPage(String queryOrUrl) {
@@ -577,20 +579,17 @@ public class MainActivity extends AppCompatActivity
         new MaterialDialog.Builder(this)
                 .title("Add to Home screen")
                 .inputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_CAP_SENTENCES)
-                .input("Shortcut name", webView.getTitle(), false, new MaterialDialog.InputCallback() {
-                    @Override
-                    public void onInput(@NonNull MaterialDialog dialog, CharSequence input) {
-                        final Intent intent = new Intent();
-                        intent.putExtra(Intent.EXTRA_SHORTCUT_INTENT, shortcutIntent);
-                        intent.putExtra(Intent.EXTRA_SHORTCUT_NAME, input.toString());
-                        intent.putExtra(Intent.EXTRA_SHORTCUT_ICON, webView.getFavicon());
-                        intent.setAction("com.android.launcher.action.INSTALL_SHORTCUT");
-                        sendBroadcast(intent);
+                .input("Shortcut name", webView.getTitle(), false, (dialog, input) -> {
+                    final Intent intent = new Intent();
+                    intent.putExtra(Intent.EXTRA_SHORTCUT_INTENT, shortcutIntent);
+                    intent.putExtra(Intent.EXTRA_SHORTCUT_NAME, input.toString());
+                    intent.putExtra(Intent.EXTRA_SHORTCUT_ICON, webView.getFavicon());
+                    intent.setAction("com.android.launcher.action.INSTALL_SHORTCUT");
+                    sendBroadcast(intent);
 
-                        Toast.makeText(MainActivity.this,
-                                "Shortcut added to Home screen",
-                                Toast.LENGTH_SHORT).show();
-                    }
+                    Toast.makeText(MainActivity.this,
+                            "Shortcut added to Home screen",
+                            Toast.LENGTH_SHORT).show();
                 })
                 .show();
     }
@@ -603,7 +602,9 @@ public class MainActivity extends AppCompatActivity
             if (sdk < android.os.Build.VERSION_CODES.HONEYCOMB) {
                 android.text.ClipboardManager clipboard = (android.text.ClipboardManager) context
                         .getSystemService(Context.CLIPBOARD_SERVICE);
-                clipboard.setText(text);
+                if (clipboard != null) {
+                    clipboard.setText(text);
+                }
             } else {
                 android.content.ClipboardManager clipboard = (android.content.ClipboardManager) context
                         .getSystemService(Context.CLIPBOARD_SERVICE);
@@ -611,7 +612,9 @@ public class MainActivity extends AppCompatActivity
                         .newPlainText(
                                 context.getResources().getString(
                                         R.string.app_name), text);
-                clipboard.setPrimaryClip(clip);
+                if (clipboard != null) {
+                    clipboard.setPrimaryClip(clip);
+                }
             }
             return true;
         } catch (Exception e) {
@@ -741,7 +744,7 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onPageFinished(String url) {
-        showUi();
+//        showUi();
     }
 
     @Override
@@ -828,9 +831,11 @@ public class MainActivity extends AppCompatActivity
         }
         // if the download manager app has been disabled on the device
         catch (IllegalArgumentException e) {
+            Toast.makeText(this, "Please enable the download manager.", Toast.LENGTH_SHORT).show();
             // show the settings screen where the user can enable the download manager app again
             openAppSettings(this, AdvancedWebView.PACKAGE_NAME_DOWNLOAD_MANAGER);
             return;
+        } catch (Exception ignored) {
         }
 
         Toast.makeText(getApplicationContext(), "Downloading File", Toast.LENGTH_LONG).show();
@@ -881,7 +886,7 @@ public class MainActivity extends AppCompatActivity
         public void onReceivedError(WebView view, WebResourceRequest request, WebResourceError error) {
             Toast.makeText(
                     activity,
-                    "Error occurred: " + error.getDescription(),
+                    "Error: " + error.getDescription(),
                     Toast.LENGTH_SHORT
             ).show();
             super.onReceivedError(view, request, error);
@@ -958,7 +963,7 @@ public class MainActivity extends AppCompatActivity
                         hideKeyboard();
                         webView.requestFocus();
                     } else {
-                        showUi();
+//                        showUi();
                     }
                     break;
                 }

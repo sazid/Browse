@@ -65,5 +65,6 @@
     <string name="pref_title_email">Email developer</string>
 
     <string name="pref_project_page">Project page</string>
+    <string name="url_field_hint">Enter URL or search Google...</string>
 
 </resources>
