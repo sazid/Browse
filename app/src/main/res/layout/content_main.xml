@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nonVideoLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -13,6 +13,7 @@
         android:id="@+id/browse_webView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_above="@id/bottom_bar"
         android:fadeScrollbars="true"
         android:scrollbars="vertical|horizontal" />
 
@@ -20,6 +21,7 @@
         android:id="@+id/bottom_bar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
         android:layout_gravity="bottom"
         android:orientation="vertical">
 
@@ -62,16 +64,16 @@
                 android:id="@+id/title_tv"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
+                android:layout_marginStart="2dp"
                 android:layout_weight="1"
                 android:ellipsize="end"
                 android:gravity="center_vertical"
                 android:maxLines="1"
-                android:textSize="10sp"
-                tools:hint="HELLO WORLD"
                 android:text=""
-                android:layout_marginStart="2dp"
                 android:textAppearance="?android:attr/textAppearanceSmall"
-                android:textColor="@android:color/black" />
+                android:textColor="@android:color/black"
+                android:textSize="9sp"
+                tools:hint="HELLO WORLD" />
 
         </LinearLayout>
 
@@ -95,9 +97,9 @@
                 android:maxLines="1"
                 android:padding="6dp"
                 android:scrollHorizontally="true"
-                android:textSize="14sp"
                 android:selectAllOnFocus="true"
-                android:textColor="@android:color/black" />
+                android:textColor="@android:color/black"
+                android:textSize="14sp" />
 
             <android.support.v7.widget.AppCompatImageButton
                 android:id="@+id/menu_button"
@@ -105,12 +107,12 @@
                 android:layout_height="30dp"
                 android:background="?android:selectableItemBackground"
                 android:clickable="true"
+                android:focusable="true"
                 android:onClick="onMenuButtonClick"
-                app:srcCompat="@drawable/ic_more"
-                android:focusable="true" />
+                app:srcCompat="@drawable/ic_more" />
 
         </LinearLayout>
 
     </LinearLayout>
 
-</FrameLayout>
+</RelativeLayout>
