@@ -332,6 +332,7 @@ public class MainActivity extends AppCompatActivity
     @Override
     public boolean onEditorAction(TextView textView, int actionId, KeyEvent keyEvent) {
         if (actionId == EditorInfo.IME_ACTION_GO) {
+            webView.stopLoading();
             loadWebPage(textView.getText().toString());
             hideKeyboard();
         }
