@@ -1,7 +1,6 @@
 package com.mohammedsazid.android.browse;
 
 import android.annotation.SuppressLint;
-import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.ActivityManager;
 import android.app.DownloadManager;
@@ -12,12 +11,10 @@ import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.preference.PreferenceManager;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.PopupMenu;
@@ -181,9 +178,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void setupAutoCompleteList() {
-        autoCompleteList.add("animeheaven.eu");
         autoCompleteList.add("gmail.com");
-        autoCompleteList.add("webtoons.com");
         autoCompleteList.add("google.com");
         autoCompleteList.add("facebook.com");
         autoCompleteList.add("twitter.com");
@@ -227,9 +222,9 @@ public class MainActivity extends AppCompatActivity
         webView.setWebViewClient(new InsideWebViewClient(this));
         webView.addHttpHeader("X-Requested-With", getString(R.string.app_name));
 
-        webView.getSettings().setAppCacheEnabled(true);
-        webView.getSettings().setAppCachePath(getCacheDir().getAbsolutePath()
-                + File.separator + "appCache" + File.separator);
+//        webView.getSettings().setAppCacheEnabled(true);
+//        webView.getSettings().setAppCachePath(getCacheDir().getAbsolutePath()
+//                + File.separator + "appCache" + File.separator);
         webView.setSaveEnabled(true);
 
         registerForContextMenu(webView);
@@ -252,9 +247,7 @@ public class MainActivity extends AppCompatActivity
                 | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
                 | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION // hide nav bar
                 | View.SYSTEM_UI_FLAG_FULLSCREEN; // hide status bar
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.KITKAT) {
-            flags |= View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY;
-        }
+        flags |= View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY;
         getWindow().getDecorView().setSystemUiVisibility(flags);
     }
 
@@ -270,10 +263,8 @@ public class MainActivity extends AppCompatActivity
                 menu.add(0, ID_SAVE_IMAGE, 0, "Save image").setOnMenuItemClickListener(this);
                 menu.add(0, ID_OPEN_IMAGE, 1, "Open image").setOnMenuItemClickListener(this);
 
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                    menu.add(0, ID_OPEN_IMAGE_IN_NEW_WINDOW, 2, "Open image in new window")
-                            .setOnMenuItemClickListener(this);
-                }
+                menu.add(0, ID_OPEN_IMAGE_IN_NEW_WINDOW, 2, "Open image in new window")
+                        .setOnMenuItemClickListener(this);
                 break;
             case WebView.HitTestResult.SRC_IMAGE_ANCHOR_TYPE:
                 menu.setHeaderTitle(hitTestResult.getExtra());
@@ -284,11 +275,9 @@ public class MainActivity extends AppCompatActivity
                 menu.add(1, ID_OPEN_IMAGE, 4, "Open image").setOnMenuItemClickListener(this);
                 menu.add(1, ID_SAVE_IMAGE, 6, "Save image").setOnMenuItemClickListener(this);
 
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                    menu.add(0, ID_OPEN_LINK_IN_NEW_WINDOW, 3, "Open link in new window")
-                            .setOnMenuItemClickListener(this);
-                    menu.add(1, ID_OPEN_IMAGE_IN_NEW_WINDOW, 5, "Open image in new window").setOnMenuItemClickListener(this);
-                }
+                menu.add(0, ID_OPEN_LINK_IN_NEW_WINDOW, 3, "Open link in new window")
+                        .setOnMenuItemClickListener(this);
+                menu.add(1, ID_OPEN_IMAGE_IN_NEW_WINDOW, 5, "Open image in new window").setOnMenuItemClickListener(this);
                 break;
             case WebView.HitTestResult.SRC_ANCHOR_TYPE:
                 menu.setHeaderTitle(hitTestResult.getExtra());
@@ -296,10 +285,8 @@ public class MainActivity extends AppCompatActivity
                 menu.add(0, ID_SHARE_LINK, 1, "Share link").setOnMenuItemClickListener(this);
                 menu.add(0, ID_SAVE_LINK, 2, "Save link").setOnMenuItemClickListener(this);
 
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                    menu.add(0, ID_OPEN_LINK_IN_NEW_WINDOW, 3, "Open link in new window")
-                            .setOnMenuItemClickListener(this);
-                }
+                menu.add(0, ID_OPEN_LINK_IN_NEW_WINDOW, 3, "Open link in new window")
+                        .setOnMenuItemClickListener(this);
                 break;
         }
     }
@@ -310,23 +297,20 @@ public class MainActivity extends AppCompatActivity
         getWindow().getDecorView().setSystemUiVisibility(0);
     }
 
-    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     private void setTaskTitleAndIcon(String title, @Nullable Bitmap icon) {
         titleTv.setText(title);
         setTitle(title);
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
-            ActivityManager.TaskDescription taskDescription;
+        ActivityManager.TaskDescription taskDescription;
 
-            if (icon != null) {
-                taskDescription = new ActivityManager.TaskDescription("B: " + title, icon);
-                setTaskDescription(taskDescription);
-            } else {
-                taskDescription = new ActivityManager.TaskDescription("B: " + title);
-                setTaskDescription(taskDescription);
-            }
-
+        if (icon != null) {
+            taskDescription = new ActivityManager.TaskDescription("B: " + title, icon);
+            setTaskDescription(taskDescription);
+        } else {
+            taskDescription = new ActivityManager.TaskDescription("B: " + title);
             setTaskDescription(taskDescription);
         }
+
+        setTaskDescription(taskDescription);
     }
 
     @Override
@@ -493,80 +477,64 @@ public class MainActivity extends AppCompatActivity
     public boolean onMenuItemClick(MenuItem item) {
         WebView.HitTestResult hitTestResult = webView.getHitTestResult();
 
-        switch (item.getItemId()) {
-            case R.id.action_stop:
-                webView.stopLoading();
-                return true;
-
-            case R.id.action_reload:
-                webView.stopLoading();
-                webView.reload();
-                return true;
-
-            case R.id.action_forward:
-                if (webView.canGoForward()) {
-                    webView.goForward();
-                }
-                return true;
-
-            case R.id.action_settings:
-                Intent settingsIntent = new Intent(this, BrowseSettings.class);
-                startActivity(settingsIntent);
-                return true;
-
-            case R.id.action_new_tab:
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                    Intent intent = new Intent(this, MainActivity.class);
-                    intent.addFlags(Intent.FLAG_ACTIVITY_MULTIPLE_TASK);
-                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_DOCUMENT);
-                    startActivity(intent);
-                }
-                return true;
-
-            case R.id.action_add_to_home_screen:
-                addCurrentSiteToHomeScreen();
-                return true;
-
-            case R.id.action_share:
-                shareUrl(webView.getUrl());
-                return true;
+        int itemId = item.getItemId();
+        if (itemId == R.id.action_stop) {
+            webView.stopLoading();
+            return true;
+        } else if (itemId == R.id.action_reload) {
+            webView.stopLoading();
+            webView.reload();
+            return true;
+        } else if (itemId == R.id.action_forward) {
+            if (webView.canGoForward()) {
+                webView.goForward();
+            }
+            return true;
+        } else if (itemId == R.id.action_settings) {
+            Intent settingsIntent = new Intent(this, BrowseSettings.class);
+            startActivity(settingsIntent);
+            return true;
+        } else if (itemId == R.id.action_new_tab) {
+            Intent intent = new Intent(this, MainActivity.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_MULTIPLE_TASK);
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_DOCUMENT);
+            startActivity(intent);
+            return true;
+        } else if (itemId == R.id.action_add_to_home_screen) {
+            addCurrentSiteToHomeScreen();
+            return true;
+        } else if (itemId == R.id.action_share) {
+            shareUrl(webView.getUrl());
+            return true;
 
             // --- WebView context menu items --- //
-            case ID_SAVE_IMAGE:
-                // this will fail in several occasion
-                // TODO: 9/30/16 http://stackoverflow.com/questions/3474448/saving-image-webview-android/3475772#3475772
-                downloadFile(hitTestResult.getExtra(),
-                        Uri.parse(hitTestResult.getExtra())
-                                .getLastPathSegment());
-                return true;
-
-            case ID_OPEN_IMAGE:
-                loadWebPage(hitTestResult.getExtra());
-                return true;
-
-            case ID_SAVE_LINK:
-                downloadFile(hitTestResult.getExtra(),
-                        Uri.parse(hitTestResult.getExtra())
-                                .getLastPathSegment());
-                return true;
-
-            case ID_SHARE_LINK:
-                shareUrl(hitTestResult.getExtra());
-                return true;
-
-            case ID_COPY_LINK:
-                copyToClipboard(this, hitTestResult.getExtra());
-                Toast.makeText(this, "Copied to clipboard", Toast.LENGTH_SHORT).show();
-                return true;
-
-            case ID_OPEN_IMAGE_IN_NEW_WINDOW:
-            case ID_OPEN_LINK_IN_NEW_WINDOW:
-//                Intent newWindowIntent = new Intent(this, MainActivity.class);
-                Intent newWindowIntent = new Intent(
-                        Intent.ACTION_VIEW, Uri.parse(hitTestResult.getExtra()));
-                newWindowIntent.setComponent(new ComponentName(this, MainActivity.class));
-                startActivity(newWindowIntent);
-                return true;
+        } else if (itemId == ID_SAVE_IMAGE) {// this will fail in several occasion
+            // TODO: 9/30/16 http://stackoverflow.com/questions/3474448/saving-image-webview-android/3475772#3475772
+            downloadFile(hitTestResult.getExtra(),
+                    Uri.parse(hitTestResult.getExtra())
+                            .getLastPathSegment());
+            return true;
+        } else if (itemId == ID_OPEN_IMAGE) {
+            loadWebPage(hitTestResult.getExtra());
+            return true;
+        } else if (itemId == ID_SAVE_LINK) {
+            downloadFile(hitTestResult.getExtra(),
+                    Uri.parse(hitTestResult.getExtra())
+                            .getLastPathSegment());
+            return true;
+        } else if (itemId == ID_SHARE_LINK) {
+            shareUrl(hitTestResult.getExtra());
+            return true;
+        } else if (itemId == ID_COPY_LINK) {
+            copyToClipboard(this, hitTestResult.getExtra());
+            Toast.makeText(this, "Copied to clipboard", Toast.LENGTH_SHORT).show();
+            return true;
+        } else if (itemId == ID_OPEN_IMAGE_IN_NEW_WINDOW || itemId == ID_OPEN_LINK_IN_NEW_WINDOW) {//                Intent newWindowIntent = new Intent(this, MainActivity.class);
+            Intent newWindowIntent = new Intent(
+                    Intent.ACTION_VIEW, Uri.parse(hitTestResult.getExtra()));
+            newWindowIntent.setComponent(new ComponentName(this, MainActivity.class));
+            startActivity(newWindowIntent);
+            return true;
         }
 
         return false;
@@ -597,7 +565,7 @@ public class MainActivity extends AppCompatActivity
 
     @SuppressLint("NewApi")
     @SuppressWarnings("deprecation")
-    public boolean copyToClipboard(Context context, String text) {
+    public void copyToClipboard(Context context, String text) {
         try {
             int sdk = android.os.Build.VERSION.SDK_INT;
             if (sdk < android.os.Build.VERSION_CODES.HONEYCOMB) {
@@ -617,9 +585,7 @@ public class MainActivity extends AppCompatActivity
                     clipboard.setPrimaryClip(clip);
                 }
             }
-            return true;
-        } catch (Exception e) {
-            return false;
+        } catch (Exception ignored) {
         }
     }
 
@@ -668,11 +634,9 @@ public class MainActivity extends AppCompatActivity
                 }
             }
         } catch (SecurityException e) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                Toast.makeText(this, "Please enable STORAGE permission!",
-                        Toast.LENGTH_LONG).show();
-                openAppDetailsIntent(MainActivity.this, getPackageName());
-            }
+            Toast.makeText(this, "Please enable STORAGE permission!",
+                    Toast.LENGTH_LONG).show();
+            openAppDetailsIntent(MainActivity.this, getPackageName());
             e.printStackTrace();
         } catch (Exception e) {
             Toast.makeText(this, "Failed to download file",
@@ -822,11 +786,9 @@ public class MainActivity extends AppCompatActivity
                 dm.enqueue(request);
             }
         } catch (SecurityException e) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                Toast.makeText(this, "Please enable STORAGE permission!",
-                        Toast.LENGTH_LONG).show();
-                openAppSettings(this, getPackageName());
-            }
+            Toast.makeText(this, "Please enable STORAGE permission!",
+                    Toast.LENGTH_LONG).show();
+            openAppSettings(this, getPackageName());
 
             return;
         }
@@ -851,7 +813,6 @@ public class MainActivity extends AppCompatActivity
             this.activity = activity;
         }
 
-        @TargetApi(Build.VERSION_CODES.LOLLIPOP)
         @Override
         // Force links to be opened inside WebView and not in Default Browser
         // Thanks http://stackoverflow.com/a/33681975/1815624
@@ -882,7 +843,6 @@ public class MainActivity extends AppCompatActivity
             return super.shouldOverrideUrlLoading(view, url);
         }
 
-        @TargetApi(Build.VERSION_CODES.M)
         @Override
         public void onReceivedError(WebView view, WebResourceRequest request, WebResourceError error) {
             Toast.makeText(

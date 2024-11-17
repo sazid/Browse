@@ -944,14 +944,14 @@ public class AdvancedWebView extends WebView {
                 }
             }
 
-            @Override
-            public void onReachedMaxAppCacheSize(long requiredStorage, long quota, QuotaUpdater quotaUpdater) {
-                if (mCustomWebChromeClient != null) {
-                    mCustomWebChromeClient.onReachedMaxAppCacheSize(requiredStorage, quota, quotaUpdater);
-                } else {
-                    super.onReachedMaxAppCacheSize(requiredStorage, quota, quotaUpdater);
-                }
-            }
+//            @Override
+//            public void onReachedMaxAppCacheSize(long requiredStorage, long quota, QuotaUpdater quotaUpdater) {
+//                if (mCustomWebChromeClient != null) {
+//                    mCustomWebChromeClient.onReachedMaxAppCacheSize(requiredStorage, quota, quotaUpdater);
+//                } else {
+//                    super.onReachedMaxAppCacheSize(requiredStorage, quota, quotaUpdater);
+//                }
+//            }
 
         });
 

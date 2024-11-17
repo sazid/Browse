@@ -1,17 +1,25 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 27
-    buildToolsVersion "27.0.3"
+    signingConfigs {
+        debug {
+            storeFile file('C:\\Users\\sazid\\OneDrive\\android_keystore\\android.jks')
+            storePassword 'Msar4199s.rashidautomation!blender'
+            keyPassword 'Msar4199hummingsky'
+            keyAlias 'szandroidhummingskykey'
+        }
+    }
+    namespace "com.mohammedsazid.android.browse"
+    compileSdk 35
 
     defaultConfig {
         applicationId "com.mohammedsazid.android.browse"
-        minSdkVersion 18
-        targetSdkVersion 27
+        minSdk 27
+        targetSdkVersion 35
         versionCode 2
         versionName "1.1"
         testInstrumentationRunner 'android.support.test.runner.AndroidJUnitRunner'
-        vectorDrawables.useSupportLibrary = true
+//        vectorDrawables.useSupportLibrary = true
     }
     buildTypes {
         debug {
@@ -26,13 +34,21 @@ android {
         }
     }
     compileOptions {
-        targetCompatibility 1.8
-        sourceCompatibility 1.8
+        sourceCompatibility JavaVersion.VERSION_11
+        targetCompatibility JavaVersion.VERSION_17
     }
-    // This is important, it will run lint checks but won't abort build
-    lintOptions {
-        abortOnError false
+    dependenciesInfo {
+        includeInApk false
+        includeInBundle false
     }
+//    compileOptions {
+//        targetCompatibility 1.8
+//        sourceCompatibility 1.8
+//    }
+//    // This is important, it will run lint checks but won't abort build
+//    lintOptions {
+//        abortOnError false
+//    }
 }
 
 dependencies {
@@ -40,9 +56,9 @@ dependencies {
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'
     }
-    implementation 'com.android.support:appcompat-v7:27.1.1'
+    implementation 'com.android.support:appcompat-v7:28.0.0'
     implementation 'com.afollestad.material-dialogs:core:0.9.6.0'
-    implementation 'com.android.support:support-v4:27.1.1'
-    implementation 'com.android.support:support-vector-drawable:27.1.1'
+    implementation 'com.android.support:support-v4:28.0.0'
+    implementation 'com.android.support:support-vector-drawable:28.0.0'
     testImplementation 'junit:junit:4.12'
 }
